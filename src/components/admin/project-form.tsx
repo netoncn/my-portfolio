@@ -73,7 +73,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
   useEffect(() => {
     getAllTechnologies().then((techs) => {
-      setAvailableTechnologies(techs.map((t) => ({ value: t.name, label: t.name })))
+      setAvailableTechnologies(techs.map((t) => ({ value: t.id, label: t.name })))
     })
   }, [])
 
@@ -83,18 +83,44 @@ export function ProjectForm({ project }: ProjectFormProps) {
     }
   }, [title, project])
 
+  const getTechLabel = (id: string) =>
+    availableTechnologies.find((t) => t.value === id)?.label ?? id
+
   const handleAddTechnology = async () => {
-    if (selectedTechForAdd && !technologies.includes(selectedTechForAdd)) {
-      setTechnologies([...technologies, selectedTechForAdd])
+    if (selectedTechForAdd) {
+      if (!technologies.includes(selectedTechForAdd)) {
+        setTechnologies((prev) => [...prev, selectedTechForAdd])
+      }
       setSelectedTechForAdd("")
-    } else if (newTechInput.trim() && !technologies.includes(newTechInput.trim())) {
-      const newTech = newTechInput.trim()
-      await createTechnology({ name: newTech, slug: generateSlug(newTech) })
-      setTechnologies([...technologies, newTech])
-      setNewTechInput("")
-      const techs = await getAllTechnologies()
-      setAvailableTechnologies(techs.map((t) => ({ value: t.name, label: t.name })))
+      return
     }
+
+    const trimmed = newTechInput.trim()
+    if (!trimmed) return
+
+    const existing = availableTechnologies.find(
+      (t) => t.label.toLowerCase() === trimmed.toLowerCase(),
+    )
+
+    let techId: string
+
+    if (existing) {
+      techId = existing.value
+    } else {
+      techId = await createTechnology({
+        name: trimmed,
+        slug: generateSlug(trimmed),
+      })
+
+      const techs = await getAllTechnologies()
+      setAvailableTechnologies(techs.map((t) => ({ value: t.id, label: t.name })))
+    }
+
+    if (!technologies.includes(techId)) {
+      setTechnologies((prev) => [...prev, techId])
+    }
+
+    setNewTechInput("")
   }
 
   const handleRemoveTechnology = (tech: string) => {
@@ -369,7 +395,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         <div className="flex flex-wrap gap-2">
           {technologies.map((tech) => (
             <Badge key={tech} variant="secondary" className="gap-1">
-              {tech}
+              {getTechLabel(tech)}
               <button
                 type="button"
                 onClick={() => handleRemoveTechnology(tech)}

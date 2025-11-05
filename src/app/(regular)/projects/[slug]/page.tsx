@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation"
-import Image from "next/image"
-import { Footer } from "@/components/portfolio/footer"
 import { getProjectBySlug, getAllProjectSlugs } from "@/lib/firebase/services/projects"
 import { ProjectInfo } from "@/components/portfolio/project-info"
 

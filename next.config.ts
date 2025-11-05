@@ -10,7 +10,8 @@ const nextConfig: NextConfig = {
   // ==================== IMAGES ====================
   images: {
     formats: ["image/avif", "image/webp"],
-
+    minimumCacheTTL: 31536000, // 1 ano
+    
     remotePatterns: [
       {
         protocol: "https",
@@ -30,7 +31,37 @@ const nextConfig: NextConfig = {
       "date-fns",
       "recharts",
       "@radix-ui/react-icons",
+      "framer-motion",
+      "firebase/firestore",
+      "firebase/auth",
     ],
+  },
+
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? {
+      exclude: ["error", "warn"],
+    } : false,
+  },
+
+  // ==================== WEBPACK ====================
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
+    config.optimization = {
+      ...config.optimization,
+      usedExports: true,
+      sideEffects: false,
+    };
+
+    return config;
   },
 
   // ==================== SECURITY HEADERS ====================
@@ -54,6 +85,28 @@ const nextConfig: NextConfig = {
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, must-revalidate",
           },
         ],
       },

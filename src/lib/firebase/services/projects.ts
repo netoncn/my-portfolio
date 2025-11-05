@@ -15,6 +15,7 @@ import {
 import { db } from "../config"
 import type { Project, ProjectCategory } from "../types"
 import { COLLECTIONS } from "../collections"
+import { cache } from "react"
 
 function serializeProject(document: QueryDocumentSnapshot<DocumentData>): Project {
   const data = document.data() as any
@@ -37,61 +38,59 @@ function serializeProject(document: QueryDocumentSnapshot<DocumentData>): Projec
   } as Project
 }
 
-export async function getPublishedProjects(
-  category?: ProjectCategory,
-  limitCount?: number,
-): Promise<Project[]> {
-  try {
-    const constraints: QueryConstraint[] = [
-      where("status", "==", "published"),
-      orderBy("order", "asc"),
-      orderBy("createdAt", "desc"),
-    ]
+export const getPublishedProjects = cache(
+  async (category?: ProjectCategory, limitCount?: number): Promise<Project[]> => {
+    try {
+      const constraints: QueryConstraint[] = [
+        where("status", "==", "published"),
+        orderBy("order", "asc"),
+        orderBy("createdAt", "desc"),
+      ]
 
-    if (category) {
-      constraints.push(where("category", "==", category))
+      if (category) {
+        constraints.push(where("category", "==", category))
+      }
+
+      if (typeof limitCount === "number") {
+        constraints.push(limit(limitCount))
+      }
+
+      const q = query(collection(db, COLLECTIONS.PROJECTS), ...constraints)
+      const querySnapshot = await getDocs(q)
+
+      return querySnapshot.docs.map(serializeProject)
+    } catch (error) {
+      console.error("[v0] Error getting published projects:", error)
+      return []
     }
-
-    if (typeof limitCount === "number") {
-      constraints.push(limit(limitCount))
-    }
-
-    const q = query(collection(db, COLLECTIONS.PROJECTS), ...constraints)
-    const querySnapshot = await getDocs(q)
-
-    return querySnapshot.docs.map(serializeProject)
-  } catch (error) {
-    console.error("[v0] Error getting published projects:", error)
-    return []
   }
-}
+)
 
-export async function getFeaturedProjects(): Promise<Project[]> {
+export const getFeaturedProjects = cache(async (): Promise<Project[]> => {
   try {
     const q = query(
       collection(db, COLLECTIONS.PROJECTS),
       where("status", "==", "published"),
       where("featured", "==", true),
       orderBy("order", "asc"),
-      limit(6),
+      limit(6)
     )
 
     const querySnapshot = await getDocs(q)
-
     return querySnapshot.docs.map(serializeProject)
   } catch (error) {
     console.error("[v0] Error getting featured projects:", error)
     return []
   }
-}
+})
 
-export async function getProjectBySlug(slug: string): Promise<Project | null> {
+export const getProjectBySlug = cache(async (slug: string): Promise<Project | null> => {
   try {
     const q = query(
       collection(db, COLLECTIONS.PROJECTS),
       where("slug", "==", slug),
       where("status", "==", "published"),
-      limit(1),
+      limit(1)
     )
 
     const querySnapshot = await getDocs(q)
@@ -106,9 +105,9 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     console.error("[v0] Error getting project by slug:", error)
     return null
   }
-}
+})
 
-export async function getProjectById(id: string): Promise<Project | null> {
+export const getProjectById = cache(async (id: string): Promise<Project | null> => {
   try {
     const docRef = doc(db, COLLECTIONS.PROJECTS, id)
     const docSnap = await getDoc(docRef)
@@ -139,11 +138,14 @@ export async function getProjectById(id: string): Promise<Project | null> {
     console.error("[v0] Error getting project by ID:", error)
     return null
   }
-}
+})
 
-export async function getAllProjectSlugs(): Promise<string[]> {
+export const getAllProjectSlugs = cache(async (): Promise<string[]> => {
   try {
-    const q = query(collection(db, COLLECTIONS.PROJECTS), where("status", "==", "published"))
+    const q = query(
+      collection(db, COLLECTIONS.PROJECTS),
+      where("status", "==", "published")
+    )
 
     const querySnapshot = await getDocs(q)
 
@@ -155,4 +157,4 @@ export async function getAllProjectSlugs(): Promise<string[]> {
     console.error("[v0] Error getting project slugs:", error)
     return []
   }
-}
+})

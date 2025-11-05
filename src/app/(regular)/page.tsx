@@ -1,7 +1,6 @@
 import { HeroSection } from "@/components/portfolio/hero-section"
 import { ProjectsGrid } from "@/components/portfolio/projects-grid"
 import { ContactSection } from "@/components/portfolio/contact-section"
-import { Footer } from "@/components/portfolio/footer"
 // import { ChatWidget } from "@/components/portfolio/chat-widget"
 import { getPublishedProjects } from "@/lib/firebase/services/projects"
 import { getSettings } from "@/lib/firebase/services/settings"

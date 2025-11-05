@@ -11,14 +11,12 @@ import {
   serverTimestamp,
   increment,
   where,
-  limit as limitQuery,
-  type QueryDocumentSnapshot,
+  setDoc,
+  QueryDocumentSnapshot, // Added setDoc import
 } from "firebase/firestore"
 import { db } from "../config"
 import type { Technology, TechnologyFormData } from "../types"
 import { COLLECTIONS } from "../collections"
-
-const technologiesCollection = collection(db, COLLECTIONS.TECHNOLOGIES)
 
 function mapDocToTechnology(document: QueryDocumentSnapshot): Technology {
   const data = document.data() as Omit<Technology, "id">
@@ -30,17 +28,13 @@ function mapDocToTechnology(document: QueryDocumentSnapshot): Technology {
 
 export async function getAllTechnologies(): Promise<Technology[]> {
   try {
-    const q = query(
-      technologiesCollection,
-      orderBy("usageCount", "desc"),
-      orderBy("name", "asc"),
-    )
+    const q = query(collection(db, COLLECTIONS.TECHNOLOGIES), orderBy("usageCount", "desc"), orderBy("name", "asc"))
 
     const querySnapshot = await getDocs(q)
 
     return querySnapshot.docs.map(mapDocToTechnology)
   } catch (error) {
-    console.error("[technologies] Error getting all technologies:", error)
+    console.error("[v0] Error getting technologies:", error)
     return []
   }
 }
@@ -48,18 +42,19 @@ export async function getAllTechnologies(): Promise<Technology[]> {
 export async function getMostUsedTechnologies(limit = 10): Promise<Technology[]> {
   try {
     const q = query(
-      technologiesCollection,
+      collection(db, COLLECTIONS.TECHNOLOGIES),
       where("usageCount", ">", 0),
       orderBy("usageCount", "desc"),
       orderBy("name", "asc"),
-      limitQuery(limit),
     )
 
     const querySnapshot = await getDocs(q)
+    const technologies = querySnapshot.docs.map(mapDocToTechnology)
 
-    return querySnapshot.docs.map(mapDocToTechnology)
+
+    return technologies.slice(0, limit)
   } catch (error) {
-    console.error("[technologies] Error getting most used technologies:", error)
+    console.error("[v0] Error getting most used technologies:", error)
     return []
   }
 }
@@ -75,39 +70,32 @@ export async function getTechnologyById(id: string): Promise<Technology | null> 
 
     return mapDocToTechnology(docSnap as QueryDocumentSnapshot)
   } catch (error) {
-    console.error("[technologies] Error getting technology by id:", error)
+    console.error("[v0] Error getting technology:", error)
     return null
   }
 }
 
 export async function createTechnology(data: TechnologyFormData): Promise<string> {
   try {
-    const docRef = await addDoc(technologiesCollection, {
+    const docRef = await addDoc(collection(db, COLLECTIONS.TECHNOLOGIES), {
       ...data,
       usageCount: 0,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
     })
 
     return docRef.id
   } catch (error) {
-    console.error("[technologies] Error creating technology:", error)
+    console.error("[v0] Error creating technology:", error)
     throw new Error("Falha ao criar tecnologia")
   }
 }
 
-export async function updateTechnology(
-  id: string,
-  data: Partial<TechnologyFormData>,
-): Promise<void> {
+export async function updateTechnology(id: string, data: Partial<TechnologyFormData>): Promise<void> {
   try {
     const docRef = doc(db, COLLECTIONS.TECHNOLOGIES, id)
-    await updateDoc(docRef, {
-      ...data,
-      updatedAt: serverTimestamp(),
-    })
+    await updateDoc(docRef, data)
   } catch (error) {
-    console.error("[technologies] Error updating technology:", error)
+    console.error("[v0] Error updating technology:", error)
     throw new Error("Falha ao atualizar tecnologia")
   }
 }
@@ -117,7 +105,7 @@ export async function deleteTechnology(id: string): Promise<void> {
     const docRef = doc(db, COLLECTIONS.TECHNOLOGIES, id)
     await deleteDoc(docRef)
   } catch (error) {
-    console.error("[technologies] Error deleting technology:", error)
+    console.error("[v0] Error deleting technology:", error)
     throw new Error("Falha ao deletar tecnologia")
   }
 }
@@ -125,10 +113,13 @@ export async function deleteTechnology(id: string): Promise<void> {
 export async function incrementTechnologyUsage(id: string): Promise<void> {
   try {
     const docRef = doc(db, COLLECTIONS.TECHNOLOGIES, id)
-    await updateDoc(docRef, {
-      usageCount: increment(1),
-      updatedAt: serverTimestamp(),
-    })
+    await setDoc(
+      docRef,
+      {
+        usageCount: increment(1),
+      },
+      { merge: true },
+    )
   } catch (error) {
     console.error("[technologies] Error incrementing technology usage:", error)
   }
@@ -137,10 +128,13 @@ export async function incrementTechnologyUsage(id: string): Promise<void> {
 export async function decrementTechnologyUsage(id: string): Promise<void> {
   try {
     const docRef = doc(db, COLLECTIONS.TECHNOLOGIES, id)
-    await updateDoc(docRef, {
-      usageCount: increment(-1),
-      updatedAt: serverTimestamp(),
-    })
+    await setDoc(
+      docRef,
+      {
+        usageCount: increment(-1),
+      },
+      { merge: true },
+    )
   } catch (error) {
     console.error("[technologies] Error decrementing technology usage:", error)
   }
