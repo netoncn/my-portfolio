@@ -1,0 +1,129 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "language": "Idioma",
+    "back": "Volver"
+  },
+  "languages": {
+    "en-US": "English",
+    "pt-BR": "Português",
+    "es-ES": "Español"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "signInSuccess": "¡Sesión iniciada con éxito!",
+    "signOutSuccess": "¡Sesión cerrada con éxito!",
+    "unauthorized": "Acceso no autorizado",
+    "checkingAuth": "Verificando autenticación...",
+    "adminOnly": "Solo los administradores pueden acceder a esta área"
+  },
+  "portfolio": {
+    "hero": {
+      "name": "Neton",
+      "role": "Desarrollador Full Stack",
+      "description": "Creando experiencias digitales modernas y funcionales con las mejores tecnologías del mercado.",
+      "viewProjects": "Ver Proyectos",
+      "contact": "Ponte en Contacto"
+    },
+    "projects": {
+      "title": "Proyectos Seleccionados",
+      "description": "Una colección de mis trabajos más recientes y relevantes.",
+      "withCode": "Con Código Fuente",
+      "withoutCode": "En Producción",
+      "categories": {
+        "all": "Todos",
+        "web": "Web",
+        "mobile": "Móvil",
+        "api": "API",
+        "other": "Otros"
+      },
+      "noProjects": "No se encontraron proyectos en esta categoría.",
+      "viewProject": "Ver Proyecto",
+      "viewCode": "Ver Código",
+      "viewLive": "Ver en Vivo",
+      "gallery": "Galería de Imágenes"
+    },
+    "contact": {
+      "title": "Hablemos",
+      "description": "¿Interesado en trabajar juntos? Contáctame a través de las redes sociales.",
+      "email": "Email",
+      "github": "GitHub",
+      "linkedin": "LinkedIn"
+    },
+    "chat": {
+      "title": "Asistente Virtual",
+      "placeholder": "Pregunta sobre proyectos y habilidades",
+      "send": "Enviar"
+    }
+  },
+  "admin": {
+    "title": "Panel de Administración",
+    "dashboard": "Dashboard",
+    "settings": {
+      "title": "Configuraciones",
+      "personal": "Información Personal",
+      "contact": "Contacto",
+      "seo": "SEO",
+      "updateSuccess": "Configuraciones actualizadas con éxito!"
+    },
+    "technologies": {
+      "title": "Tecnologías",
+      "new": "Nueva Tecnología",
+      "edit": "Editar Tecnología",
+      "delete": "Eliminar Tecnología",
+      "deleteConfirm": "¿Estás seguro de que deseas eliminar esta tecnología?",
+      "deleteSuccess": "Tecnología eliminada con éxito!",
+      "createSuccess": "Tecnología creada con éxito!",
+      "updateSuccess": "Tecnología actualizada con éxito!",
+      "usedInProjects": "Usada en {count} proyectos"
+    },
+    "projects": {
+      "title": "Proyectos",
+      "new": "Nuevo Proyecto",
+      "edit": "Editar Proyecto",
+      "delete": "Eliminar Proyecto",
+      "deleteConfirm": "¿Estás seguro de que deseas eliminar este proyecto?",
+      "deleteSuccess": "Proyecto eliminado con éxito!",
+      "createSuccess": "Proyecto creado con éxito!",
+      "updateSuccess": "Proyecto actualizado con éxito!",
+      "noProjects": "No se encontraron proyectos",
+      "form": {
+        "title": "Título",
+        "slug": "Slug",
+        "shortDescription": "Descripción Corta",
+        "longDescription": "Descripción Larga",
+        "category": "Categoría",
+        "technologies": "Tecnologías",
+        "selectTechnologies": "Seleccionar Tecnologías",
+        "images": "Imágenes",
+        "githubUrl": "URL de GitHub",
+        "liveUrl": "URL del Sitio",
+        "hasSourceCode": "Tiene Código Fuente Disponible",
+        "featured": "Destacado",
+        "order": "Orden",
+        "status": "Estado",
+        "statusDraft": "Borrador",
+        "statusPublished": "Publicado",
+        "statusArchived": "Archivado",
+        "multilingual": "Multilingüe"
+      }
+    },
+    "ai": {
+      "generateDescription": "Generar Descripción con IA",
+      "generating": "Generando...",
+      "error": "Error al generar descripción"
+    }
+  }
+}

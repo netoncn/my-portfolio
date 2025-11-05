@@ -1,10 +1,9 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import type { Project, ProjectFormData, ProjectCategory, ProjectStatus } from "@/lib/firebase/types"
+import type { Project, ProjectCategory, ProjectStatus, MultilingualText } from "@/lib/firebase/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,10 +11,12 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Combobox } from "@/components/ui/combobox"
 import { X } from "lucide-react"
 import { createProject, updateProject, generateSlug } from "@/lib/firebase/services/admin-projects"
+import { getAllTechnologies, createTechnology } from "@/lib/firebase/services/technologies"
 import { toast } from "sonner"
-import { AIDescriptionGenerator } from "./ai-description-generator"
 
 interface ProjectFormProps {
   project?: Project
@@ -36,36 +37,63 @@ const statuses: { value: ProjectStatus; label: string }[] = [
   { value: "archived", label: "Arquivado" },
 ]
 
+const emptyMultilingualText = (): MultilingualText => ({
+  "en-US": "",
+  "pt-BR": "",
+  "es-ES": "",
+})
+
 export function ProjectForm({ project }: ProjectFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const [title, setTitle] = useState(project?.title || "")
+  const [title, setTitle] = useState<MultilingualText>(project?.title || emptyMultilingualText())
   const [slug, setSlug] = useState(project?.slug || "")
-  const [description, setDescription] = useState(project?.description || "")
-  const [longDescription, setLongDescription] = useState(project?.longDescription || "")
+  const [shortDescription, setShortDescription] = useState<MultilingualText>(
+    project?.shortDescription || emptyMultilingualText(),
+  )
+  const [longDescription, setLongDescription] = useState<MultilingualText>(
+    project?.longDescription || emptyMultilingualText(),
+  )
   const [category, setCategory] = useState<ProjectCategory>(project?.category || "web")
   const [status, setStatus] = useState<ProjectStatus>(project?.status || "draft")
   const [technologies, setTechnologies] = useState<string[]>(project?.technologies || [])
-  const [techInput, setTechInput] = useState("")
   const [githubUrl, setGithubUrl] = useState(project?.githubUrl || "")
   const [liveUrl, setLiveUrl] = useState(project?.liveUrl || "")
+  const [hasSourceCode, setHasSourceCode] = useState(project?.hasSourceCode ?? true)
   const [thumbnailUrl, setThumbnailUrl] = useState(project?.thumbnailUrl || "")
   const [images, setImages] = useState<string[]>(project?.images || [])
   const [imageInput, setImageInput] = useState("")
   const [featured, setFeatured] = useState(project?.featured || false)
   const [order, setOrder] = useState(project?.order || 0)
 
+  const [availableTechnologies, setAvailableTechnologies] = useState<Array<{ value: string; label: string }>>([])
+  const [selectedTechForAdd, setSelectedTechForAdd] = useState("")
+  const [newTechInput, setNewTechInput] = useState("")
+
   useEffect(() => {
-    if (!project && title) {
-      setSlug(generateSlug(title))
+    getAllTechnologies().then((techs) => {
+      setAvailableTechnologies(techs.map((t) => ({ value: t.name, label: t.name })))
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!project && title["pt-BR"]) {
+      setSlug(generateSlug(title["pt-BR"]))
     }
   }, [title, project])
 
-  const handleAddTechnology = () => {
-    if (techInput.trim() && !technologies.includes(techInput.trim())) {
-      setTechnologies([...technologies, techInput.trim()])
-      setTechInput("")
+  const handleAddTechnology = async () => {
+    if (selectedTechForAdd && !technologies.includes(selectedTechForAdd)) {
+      setTechnologies([...technologies, selectedTechForAdd])
+      setSelectedTechForAdd("")
+    } else if (newTechInput.trim() && !technologies.includes(newTechInput.trim())) {
+      const newTech = newTechInput.trim()
+      await createTechnology({ name: newTech, slug: generateSlug(newTech) })
+      setTechnologies([...technologies, newTech])
+      setNewTechInput("")
+      const techs = await getAllTechnologies()
+      setAvailableTechnologies(techs.map((t) => ({ value: t.name, label: t.name })))
     }
   }
 
@@ -87,9 +115,22 @@ export function ProjectForm({ project }: ProjectFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!title.trim() || !slug.trim() || !description.trim()) {
+    const titleValid = title["en-US"].trim() && title["pt-BR"].trim() && title["es-ES"].trim()
+    const shortDescValid =
+      shortDescription["en-US"].trim() && shortDescription["pt-BR"].trim() && shortDescription["es-ES"].trim()
+    const longDescValid =
+      longDescription["en-US"].trim() && longDescription["pt-BR"].trim() && longDescription["es-ES"].trim()
+
+    if (!titleValid || !slug.trim() || !shortDescValid || !longDescValid) {
       toast.error("Campos obrigatórios", {
-        description: "Preencha título, slug e descrição",
+        description: "Preencha título, slug e descrições em todos os idiomas",
+      })
+      return
+    }
+
+    if (technologies.length === 0) {
+      toast.error("Tecnologias obrigatórias", {
+        description: "Adicione pelo menos uma tecnologia",
       })
       return
     }
@@ -97,39 +138,35 @@ export function ProjectForm({ project }: ProjectFormProps) {
     setIsSubmitting(true)
 
     try {
-      const formData: ProjectFormData = {
-        title: title.trim(),
+      const formData = {
+        title,
         slug: slug.trim(),
-        description: description.trim(),
+        shortDescription,
+        longDescription,
         category,
         status,
         technologies,
+        githubUrl: githubUrl.trim() || undefined,
+        liveUrl: liveUrl.trim() || undefined,
+        hasSourceCode,
+        thumbnailUrl: thumbnailUrl.trim() || undefined,
+        images: images.length > 0 ? images : undefined,
         featured,
         order,
       }
 
-      if (longDescription && longDescription.trim()) formData.longDescription = longDescription.trim()
-      if (githubUrl && githubUrl.trim()) formData.githubUrl = githubUrl.trim()
-      if (liveUrl && liveUrl.trim()) formData.liveUrl = liveUrl.trim()
-      if (thumbnailUrl && thumbnailUrl.trim()) formData.thumbnailUrl = thumbnailUrl.trim()
-      if (images.length > 0) formData.images = images
-
       if (project) {
         await updateProject(project.id, formData)
-        toast.success("Projeto atualizado", {
-          description: "As alterações foram salvas com sucesso",
-        })
+        toast.success("Projeto atualizado com sucesso!")
       } else {
         await createProject(formData)
-        toast.success("Projeto criado", {
-          description: "O novo projeto foi adicionado com sucesso",
-        })
+        toast.success("Projeto criado com sucesso!")
       }
 
       router.push("/admin")
       router.refresh()
     } catch (error) {
-      toast.error("Erro ao salvar", {
+      toast.error("Erro ao salvar projeto", {
         description: error instanceof Error ? error.message : "Erro desconhecido",
       })
     } finally {
@@ -138,68 +175,122 @@ export function ProjectForm({ project }: ProjectFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="title">Título *</Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Nome do projeto"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="slug">Slug *</Label>
-          <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="url-amigavel" required />
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-3">
+        <Label>Título do Projeto *</Label>
+        <Tabs defaultValue="pt-BR" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="pt-BR">Português</TabsTrigger>
+            <TabsTrigger value="en-US">English</TabsTrigger>
+            <TabsTrigger value="es-ES">Español</TabsTrigger>
+          </TabsList>
+          <TabsContent value="pt-BR" className="mt-3">
+            <Input
+              value={title["pt-BR"]}
+              onChange={(e) => setTitle({ ...title, "pt-BR": e.target.value })}
+              placeholder="Nome do projeto em português"
+              required
+            />
+          </TabsContent>
+          <TabsContent value="en-US" className="mt-3">
+            <Input
+              value={title["en-US"]}
+              onChange={(e) => setTitle({ ...title, "en-US": e.target.value })}
+              placeholder="Project name in English"
+              required
+            />
+          </TabsContent>
+          <TabsContent value="es-ES" className="mt-3">
+            <Input
+              value={title["es-ES"]}
+              onChange={(e) => setTitle({ ...title, "es-ES": e.target.value })}
+              placeholder="Nombre del proyecto en español"
+              required
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="description">Descrição Curta *</Label>
-          <AIDescriptionGenerator
-            title={title}
-            category={category}
-            technologies={technologies}
-            type="short"
-            text={description}
-            githubUrl={githubUrl}
-            onGenerated={setDescription}
-          />
-        </div>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Breve descrição do projeto"
-          rows={3}
-          required
-        />
+        <Label htmlFor="slug">Slug (URL amigável) *</Label>
+        <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="meu-projeto" required />
+        <p className="text-sm text-muted-foreground">Gerado automaticamente a partir do título em português</p>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="longDescription">Descrição Longa</Label>
-          <AIDescriptionGenerator
-            title={title}
-            category={category}
-            technologies={technologies}
-            type="long"
-            text={longDescription}
-            githubUrl={githubUrl}
-            onGenerated={setLongDescription}
-          />
-        </div>
-        <Textarea
-          id="longDescription"
-          value={longDescription}
-          onChange={(e) => setLongDescription(e.target.value)}
-          placeholder="Descrição detalhada do projeto"
-          rows={6}
-        />
+      <div className="space-y-3">
+        <Label>Descrição Curta *</Label>
+        <Tabs defaultValue="pt-BR" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="pt-BR">Português</TabsTrigger>
+            <TabsTrigger value="en-US">English</TabsTrigger>
+            <TabsTrigger value="es-ES">Español</TabsTrigger>
+          </TabsList>
+          <TabsContent value="pt-BR" className="mt-3">
+            <Textarea
+              value={shortDescription["pt-BR"]}
+              onChange={(e) => setShortDescription({ ...shortDescription, "pt-BR": e.target.value })}
+              placeholder="Breve descrição do projeto em português"
+              rows={3}
+              required
+            />
+          </TabsContent>
+          <TabsContent value="en-US" className="mt-3">
+            <Textarea
+              value={shortDescription["en-US"]}
+              onChange={(e) => setShortDescription({ ...shortDescription, "en-US": e.target.value })}
+              placeholder="Brief project description in English"
+              rows={3}
+              required
+            />
+          </TabsContent>
+          <TabsContent value="es-ES" className="mt-3">
+            <Textarea
+              value={shortDescription["es-ES"]}
+              onChange={(e) => setShortDescription({ ...shortDescription, "es-ES": e.target.value })}
+              placeholder="Breve descripción del proyecto en español"
+              rows={3}
+              required
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <div className="space-y-3">
+        <Label>Descrição Longa *</Label>
+        <Tabs defaultValue="pt-BR" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="pt-BR">Português</TabsTrigger>
+            <TabsTrigger value="en-US">English</TabsTrigger>
+            <TabsTrigger value="es-ES">Español</TabsTrigger>
+          </TabsList>
+          <TabsContent value="pt-BR" className="mt-3">
+            <Textarea
+              value={longDescription["pt-BR"]}
+              onChange={(e) => setLongDescription({ ...longDescription, "pt-BR": e.target.value })}
+              placeholder="Descrição detalhada do projeto em português"
+              rows={6}
+              required
+            />
+          </TabsContent>
+          <TabsContent value="en-US" className="mt-3">
+            <Textarea
+              value={longDescription["en-US"]}
+              onChange={(e) => setLongDescription({ ...longDescription, "en-US": e.target.value })}
+              placeholder="Detailed project description in English"
+              rows={6}
+              required
+            />
+          </TabsContent>
+          <TabsContent value="es-ES" className="mt-3">
+            <Textarea
+              value={longDescription["es-ES"]}
+              onChange={(e) => setLongDescription({ ...longDescription, "es-ES": e.target.value })}
+              placeholder="Descripción detallada del proyecto en español"
+              rows={6}
+              required
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -236,7 +327,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="order">Ordem</Label>
+          <Label htmlFor="order">Ordem de Exibição</Label>
           <Input
             id="order"
             type="number"
@@ -247,26 +338,35 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="technologies">Tecnologias</Label>
+      <div className="space-y-3">
+        <Label>Tecnologias *</Label>
         <div className="flex gap-2">
+          <Combobox
+            options={availableTechnologies}
+            value={selectedTechForAdd}
+            onValueChange={setSelectedTechForAdd}
+            placeholder="Selecione uma tecnologia..."
+            searchPlaceholder="Buscar tecnologia..."
+            emptyText="Nenhuma tecnologia encontrada."
+            className="flex-1"
+          />
           <Input
-            id="technologies"
-            value={techInput}
-            onChange={(e) => setTechInput(e.target.value)}
+            value={newTechInput}
+            onChange={(e) => setNewTechInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault()
                 handleAddTechnology()
               }
             }}
-            placeholder="Ex: React, TypeScript"
+            placeholder="Ou digite uma nova..."
+            className="flex-1"
           />
           <Button type="button" onClick={handleAddTechnology} variant="secondary">
             Adicionar
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2">
           {technologies.map((tech) => (
             <Badge key={tech} variant="secondary" className="gap-1">
               {tech}
@@ -290,38 +390,42 @@ export function ProjectForm({ project }: ProjectFormProps) {
             type="url"
             value={githubUrl}
             onChange={(e) => setGithubUrl(e.target.value)}
-            placeholder="https://github.com/..."
+            placeholder="https://github.com/usuario/projeto"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="liveUrl">URL do Projeto</Label>
+          <Label htmlFor="liveUrl">URL do Projeto Online</Label>
           <Input
             id="liveUrl"
             type="url"
             value={liveUrl}
             onChange={(e) => setLiveUrl(e.target.value)}
-            placeholder="https://..."
+            placeholder="https://meuprojeto.com"
           />
         </div>
       </div>
 
+      <div className="flex items-center space-x-2">
+        <Switch id="hasSourceCode" checked={hasSourceCode} onCheckedChange={setHasSourceCode} />
+        <Label htmlFor="hasSourceCode">Código fonte disponível publicamente</Label>
+      </div>
+
       <div className="space-y-2">
-        <Label htmlFor="thumbnailUrl">URL da Thumbnail</Label>
+        <Label htmlFor="thumbnailUrl">URL da Imagem de Capa</Label>
         <Input
           id="thumbnailUrl"
           type="url"
           value={thumbnailUrl}
           onChange={(e) => setThumbnailUrl(e.target.value)}
-          placeholder="https://..."
+          placeholder="https://exemplo.com/imagem.jpg"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="images">Galeria de Imagens</Label>
+      <div className="space-y-3">
+        <Label>Galeria de Imagens</Label>
         <div className="flex gap-2">
           <Input
-            id="images"
             type="url"
             value={imageInput}
             onChange={(e) => setImageInput(e.target.value)}
@@ -331,34 +435,37 @@ export function ProjectForm({ project }: ProjectFormProps) {
                 handleAddImage()
               }
             }}
-            placeholder="https://..."
+            placeholder="https://exemplo.com/imagem.jpg"
+            className="flex-1"
           />
           <Button type="button" onClick={handleAddImage} variant="secondary">
             Adicionar
           </Button>
         </div>
-        <div className="space-y-2 mt-2">
-          {images.map((image, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 border rounded">
-              <span className="text-sm flex-1 truncate">{image}</span>
-              <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveImage(image)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
+        {images.length > 0 && (
+          <div className="space-y-2">
+            {images.map((image, index) => (
+              <div key={index} className="flex items-center gap-2 p-2 border rounded-lg">
+                <span className="text-sm flex-1 truncate">{image}</span>
+                <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveImage(image)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center space-x-2">
         <Switch id="featured" checked={featured} onCheckedChange={setFeatured} />
-        <Label htmlFor="featured">Projeto em destaque</Label>
+        <Label htmlFor="featured">Projeto em destaque na página inicial</Label>
       </div>
 
-      <div className="flex gap-4 pt-4">
-        <Button type="submit" disabled={isSubmitting}>
+      <div className="flex gap-4 pt-6 border-t">
+        <Button type="submit" disabled={isSubmitting} size="lg">
           {isSubmitting ? "Salvando..." : project ? "Atualizar Projeto" : "Criar Projeto"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.push("/admin")}>
+        <Button type="button" variant="outline" size="lg" onClick={() => router.push("/admin")}>
           Cancelar
         </Button>
       </div>

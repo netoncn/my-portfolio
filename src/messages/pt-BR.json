@@ -1,0 +1,129 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "language": "Idioma",
+    "back": "Voltar"
+  },
+  "languages": {
+    "en-US": "English",
+    "pt-BR": "Português",
+    "es-ES": "Español"
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "signInWithGoogle": "Entrar com Google",
+    "signInSuccess": "Login realizado com sucesso!",
+    "signOutSuccess": "Logout realizado com sucesso!",
+    "unauthorized": "Acesso não autorizado",
+    "checkingAuth": "Verificando autenticação...",
+    "adminOnly": "Apenas administradores podem acessar esta área"
+  },
+  "portfolio": {
+    "hero": {
+      "name": "Nelson",
+      "role": "Desenvolvedor Full Stack",
+      "description": "Criando experiências digitais modernas e funcionais com as melhores tecnologias do mercado.",
+      "viewProjects": "Ver Projetos",
+      "contact": "Entre em Contato"
+    },
+    "projects": {
+      "title": "Projetos",
+      "description": "Uma coleção dos meus trabalhos mais recentes e relevantes.",
+      "withCode": "Com Código Fonte",
+      "withoutCode": "Em Produção",
+      "categories": {
+        "all": "Todos",
+        "web": "Web",
+        "mobile": "Mobile",
+        "api": "API",
+        "other": "Outros"
+      },
+      "noProjects": "Nenhum projeto encontrado nesta categoria.",
+      "viewProject": "Ver Projeto",
+      "viewCode": "Ver Código",
+      "viewLive": "Ver ao Vivo",
+      "gallery": "Galeria de Imagens"
+    },
+    "contact": {
+      "title": "Vamos Conversar",
+      "description": "Interessado em trabalhar juntos? Entre em contato comigo através das redes sociais.",
+      "email": "Email",
+      "github": "GitHub",
+      "linkedin": "LinkedIn"
+    },
+    "chat": {
+      "title": "Assistente Virtual",
+      "placeholder": "Pergunte sobre projetos e habilidades",
+      "send": "Enviar"
+    }
+  },
+  "admin": {
+    "title": "Painel Administrativo",
+    "dashboard": "Dashboard",
+    "settings": {
+      "title": "Configurações",
+      "personal": "Informações Pessoais",
+      "contact": "Contato",
+      "seo": "SEO",
+      "updateSuccess": "Configurações atualizadas com sucesso!"
+    },
+    "technologies": {
+      "title": "Tecnologias",
+      "new": "Nova Tecnologia",
+      "edit": "Editar Tecnologia",
+      "delete": "Excluir Tecnologia",
+      "deleteConfirm": "Tem certeza que deseja excluir esta tecnologia?",
+      "deleteSuccess": "Tecnologia excluída com sucesso!",
+      "createSuccess": "Tecnologia criada com sucesso!",
+      "updateSuccess": "Tecnologia atualizada com sucesso!",
+      "usedInProjects": "Usada em {count} projetos"
+    },
+    "projects": {
+      "title": "Projetos",
+      "new": "Novo Projeto",
+      "edit": "Editar Projeto",
+      "delete": "Excluir Projeto",
+      "deleteConfirm": "Tem certeza que deseja excluir este projeto?",
+      "deleteSuccess": "Projeto excluído com sucesso!",
+      "createSuccess": "Projeto criado com sucesso!",
+      "updateSuccess": "Projeto atualizado com sucesso!",
+      "noProjects": "Nenhum projeto encontrado",
+      "form": {
+        "title": "Título",
+        "slug": "Slug",
+        "shortDescription": "Descrição Curta",
+        "longDescription": "Descrição Longa",
+        "category": "Categoria",
+        "technologies": "Tecnologias",
+        "selectTechnologies": "Selecionar Tecnologias",
+        "images": "Imagens",
+        "githubUrl": "URL do GitHub",
+        "liveUrl": "URL do Site",
+        "hasSourceCode": "Tem Código Fonte Disponível",
+        "featured": "Destaque",
+        "order": "Ordem",
+        "status": "Status",
+        "statusDraft": "Rascunho",
+        "statusPublished": "Publicado",
+        "statusArchived": "Arquivado",
+        "multilingual": "Multilíngue"
+      }
+    },
+    "ai": {
+      "generateDescription": "Gerar Descrição com IA",
+      "generating": "Gerando...",
+      "error": "Erro ao gerar descrição"
+    }
+  }
+}

@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     const projectsContext = projects.map((p) => ({
       title: p.title,
-      description: p.description,
+      description: p.shortDescription,
       category: p.category,
       technologies: p.technologies,
       githubUrl: p.githubUrl,

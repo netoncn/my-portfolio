@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { LoginButton } from "@/components/auth/login-button"
-import { useAuth } from "@/lib/contexts/auth-context"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function AdminLoginPage() {
   const { user, isAdmin, loading } = useAuth()

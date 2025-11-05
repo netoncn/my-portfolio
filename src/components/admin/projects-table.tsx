@@ -20,6 +20,7 @@ import {
 import { Edit, Trash2, Eye } from "lucide-react"
 import { deleteProject } from "@/lib/firebase/services/admin-projects"
 import { toast } from "sonner"
+import { useI18n } from "@/i18n/client"
 
 interface ProjectsTableProps {
   projects: Project[]
@@ -38,6 +39,7 @@ const statusVariants = {
 } as const
 
 export function ProjectsTable({ projects }: ProjectsTableProps) {
+  const { locale } = useI18n()
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
@@ -97,7 +99,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           <TableBody>
             {projects.map((project) => (
               <TableRow key={project.id}>
-                <TableCell className="font-medium">{project.title}</TableCell>
+                <TableCell className="font-medium">{project.title[locale]}</TableCell>
                 <TableCell className="capitalize">{project.category}</TableCell>
                 <TableCell>
                   <Badge variant={statusVariants[project.status]}>{statusLabels[project.status]}</Badge>
@@ -134,7 +136,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O projeto "{projectToDelete?.title}" será permanentemente deletado.
+              Esta ação não pode ser desfeita. O projeto "{projectToDelete?.title[locale]}" será permanentemente deletado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

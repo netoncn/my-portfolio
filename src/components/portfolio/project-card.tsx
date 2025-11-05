@@ -6,12 +6,15 @@ import type { Project } from "@/lib/firebase/types"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/i18n/client"
 
 interface ProjectCardProps {
   project: Project
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const { locale } = useI18n()
+
   return (
     <article className="group relative overflow-hidden rounded-lg border bg-card transition-all hover:border-primary/50">
       <Link href={`/projects/${project.slug}`} className="block">
@@ -19,13 +22,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.thumbnailUrl ? (
             <Image
               src={project.thumbnailUrl || "/placeholder.svg"}
-              alt={project.title}
+              alt={project.title[locale] || "Project Thumbnail"}
               fill
               className="object-cover transition-transform group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full items-center justify-center">
-              <span className="text-4xl font-bold text-muted-foreground/20">{project.title.charAt(0)}</span>
+              <span className="text-4xl font-bold text-muted-foreground/20">{project.title[locale].charAt(0)}</span>
             </div>
           )}
         </div>
@@ -33,9 +36,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="p-6 space-y-4">
           <div className="space-y-2">
             <h3 className="text-xl font-semibold tracking-tight group-hover:text-primary transition-colors text-balance">
-              {project.title}
+              {project.title[locale]}
             </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2 text-pretty">{project.description}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2 text-pretty">{project.shortDescription[locale]}</p>
           </div>
 
           <div className="flex flex-wrap gap-2">

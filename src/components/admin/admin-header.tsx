@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LogOut, Home, Plus } from "lucide-react"
-import { useAuth } from "@/lib/contexts/auth-context"
+import { LogOut, Home, Plus, Settings } from "lucide-react"
+import { useAuth } from "@/contexts/auth-context"
 import { signOutUser } from "@/lib/firebase/auth"
 import { toast } from "sonner"
 
@@ -45,6 +45,12 @@ export function AdminHeader() {
                 <Link href="/admin/projects/new">
                   <Plus className="mr-2 h-4 w-4" />
                   Novo Projeto
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/admin/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Configurações
                 </Link>
               </Button>
             </nav>

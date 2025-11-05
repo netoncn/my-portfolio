@@ -1,0 +1,129 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "language": "Language",
+    "back": "Back"
+  },
+  "languages": {
+    "en-US": "English",
+    "pt-BR": "Português",
+    "es-ES": "Español"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signInWithGoogle": "Sign in with Google",
+    "signInSuccess": "Successfully signed in!",
+    "signOutSuccess": "Successfully signed out!",
+    "unauthorized": "Unauthorized access",
+    "checkingAuth": "Checking authentication...",
+    "adminOnly": "Only administrators can access this area"
+  },
+  "portfolio": {
+    "hero": {
+      "name": "Neton",
+      "role": "Full Stack Developer",
+      "description": "Creating modern and functional digital experiences with the best technologies on the market.",
+      "viewProjects": "View Projects",
+      "contact": "Get in Touch"
+    },
+    "projects": {
+      "title": "Selected Projects",
+      "description": "A collection of my most recent and relevant work.",
+      "withCode": "With Source Code",
+      "withoutCode": "In Production",
+      "categories": {
+        "all": "All",
+        "web": "Web",
+        "mobile": "Mobile",
+        "api": "API",
+        "other": "Others"
+      },
+      "noProjects": "No projects found in this category.",
+      "viewProject": "View Project",
+      "viewCode": "View Code",
+      "viewLive": "View Live",
+      "gallery": "Image Gallery"
+    },
+    "contact": {
+      "title": "Let's Talk",
+      "description": "Interested in working together? Get in touch with me through social media.",
+      "email": "Email",
+      "github": "GitHub",
+      "linkedin": "LinkedIn"
+    },
+    "chat": {
+      "title": "Virtual Assistant",
+      "placeholder": "Ask about projects and skills",
+      "send": "Send"
+    }
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "dashboard": "Dashboard",
+    "settings": {
+      "title": "Settings",
+      "personal": "Personal Information",
+      "contact": "Contact",
+      "seo": "SEO",
+      "updateSuccess": "Settings updated successfully!"
+    },
+    "technologies": {
+      "title": "Technologies",
+      "new": "New Technology",
+      "edit": "Edit Technology",
+      "delete": "Delete Technology",
+      "deleteConfirm": "Are you sure you want to delete this technology?",
+      "deleteSuccess": "Technology deleted successfully!",
+      "createSuccess": "Technology created successfully!",
+      "updateSuccess": "Technology updated successfully!",
+      "usedInProjects": "Used in {count} projects"
+    },
+    "projects": {
+      "title": "Projects",
+      "new": "New Project",
+      "edit": "Edit Project",
+      "delete": "Delete Project",
+      "deleteConfirm": "Are you sure you want to delete this project?",
+      "deleteSuccess": "Project deleted successfully!",
+      "createSuccess": "Project created successfully!",
+      "updateSuccess": "Project updated successfully!",
+      "noProjects": "No projects found",
+      "form": {
+        "title": "Title",
+        "slug": "Slug",
+        "shortDescription": "Short Description",
+        "longDescription": "Long Description",
+        "category": "Category",
+        "technologies": "Technologies",
+        "selectTechnologies": "Select Technologies",
+        "images": "Images",
+        "githubUrl": "GitHub URL",
+        "liveUrl": "Live URL",
+        "hasSourceCode": "Has Source Code Available",
+        "featured": "Featured",
+        "order": "Order",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "statusArchived": "Archived",
+        "multilingual": "Multilingual"
+      }
+    },
+    "ai": {
+      "generateDescription": "Generate Description with AI",
+      "generating": "Generating...",
+      "error": "Error generating description"
+    }
+  }
+}
