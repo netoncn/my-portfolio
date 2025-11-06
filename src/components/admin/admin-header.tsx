@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { LogOut, Home, Plus, Settings } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
-import { signOutUser } from "@/lib/firebase/auth"
-import { toast } from "sonner"
+import { Home, LogOut, Plus, Settings } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth-context";
+import { signOutUser } from "@/lib/firebase/auth";
 
 export function AdminHeader() {
-  const router = useRouter()
-  const { user } = useAuth()
+  const router = useRouter();
+  const { user } = useAuth();
 
   const handleSignOut = async () => {
     try {
-      await signOutUser()
+      await signOutUser();
       toast.success("Logout realizado", {
         description: "Você saiu com sucesso",
-      })
-      router.push("/admin/login")
+      });
+      router.push("/admin/login");
     } catch (error) {
       toast.error("Erro ao sair", {
-        description: error instanceof Error ? error.message : "Erro desconhecido",
-      })
+        description:
+          error instanceof Error ? error.message : "Erro desconhecido",
+      });
     }
-  }
+  };
 
   return (
     <header className="border-b bg-card">
@@ -65,5 +66,5 @@ export function AdminHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }

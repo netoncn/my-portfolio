@@ -1,12 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import type { Project } from "@/lib/firebase/types"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Edit, Eye, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,60 +14,70 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Edit, Trash2, Eye } from "lucide-react"
-import { deleteProject } from "@/lib/firebase/services/admin-projects"
-import { toast } from "sonner"
-import { useI18n } from "@/i18n/client"
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useI18n } from "@/i18n/client";
+import { deleteProject } from "@/lib/firebase/services/admin-projects";
+import type { Project } from "@/lib/firebase/types";
 
 interface ProjectsTableProps {
-  projects: Project[]
+  projects: Project[];
 }
 
 const statusLabels = {
   draft: "Rascunho",
   published: "Publicado",
   archived: "Arquivado",
-}
+};
 
 const statusVariants = {
   draft: "secondary",
   published: "default",
   archived: "outline",
-} as const
+} as const;
 
 export function ProjectsTable({ projects }: ProjectsTableProps) {
-  const { locale } = useI18n()
-  const router = useRouter()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const { locale } = useI18n();
+  const router = useRouter();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteClick = (project: Project) => {
-    setProjectToDelete(project)
-    setDeleteDialogOpen(true)
-  }
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
+  };
 
   const handleDeleteConfirm = async () => {
-    if (!projectToDelete) return
+    if (!projectToDelete) return;
 
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      await deleteProject(projectToDelete.id)
+      await deleteProject(projectToDelete.id);
       toast.success("Projeto deletado", {
         description: "O projeto foi removido com sucesso",
-      })
-      setDeleteDialogOpen(false)
-      router.refresh()
+      });
+      setDeleteDialogOpen(false);
+      router.refresh();
     } catch (error) {
       toast.error("Erro ao deletar", {
-        description: error instanceof Error ? error.message : "Erro desconhecido",
-      })
+        description:
+          error instanceof Error ? error.message : "Erro desconhecido",
+      });
     } finally {
-      setIsDeleting(false)
-      setProjectToDelete(null)
+      setIsDeleting(false);
+      setProjectToDelete(null);
     }
-  }
+  };
 
   if (projects.length === 0) {
     return (
@@ -79,7 +87,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           <Link href="/admin/projects/new">Criar Primeiro Projeto</Link>
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -99,10 +107,14 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           <TableBody>
             {projects.map((project) => (
               <TableRow key={project.id}>
-                <TableCell className="font-medium">{project.title[locale]}</TableCell>
+                <TableCell className="font-medium">
+                  {project.title[locale]}
+                </TableCell>
                 <TableCell className="capitalize">{project.category}</TableCell>
                 <TableCell>
-                  <Badge variant={statusVariants[project.status]}>{statusLabels[project.status]}</Badge>
+                  <Badge variant={statusVariants[project.status]}>
+                    {statusLabels[project.status]}
+                  </Badge>
                 </TableCell>
                 <TableCell>{project.featured ? "Sim" : "Não"}</TableCell>
                 <TableCell>{project.order}</TableCell>
@@ -110,7 +122,10 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                   <div className="flex items-center justify-end gap-2">
                     {project.status === "published" && (
                       <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/projects/${project.slug}`} target="_blank">
+                        <Link
+                          href={`/projects/${project.slug}`}
+                          target="_blank"
+                        >
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -120,7 +135,11 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                         <Edit className="h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(project)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteClick(project)}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -136,11 +155,14 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O projeto "{projectToDelete?.title[locale]}" será permanentemente deletado.
+              Esta ação não pode ser desfeita. O projeto "
+              {projectToDelete?.title[locale]}" será permanentemente deletado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               disabled={isDeleting}
@@ -152,5 +174,5 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

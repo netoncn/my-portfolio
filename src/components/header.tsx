@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ThemeToggle } from "./theme-toggle"
-import { LanguageSwitcher } from "./language-switcher"
-import { motion } from "framer-motion"
-import { smooth } from "@/lib/animations"
-import Image from "next/image"
-import { memo } from "react"
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { memo } from "react";
+import { smooth } from "@/lib/animations";
+import { LanguageSwitcher } from "./language-switcher";
+import { ThemeToggle } from "./theme-toggle";
 
 const HeaderContent = memo(function HeaderContent({ name }: { name?: string }) {
   return (
@@ -18,13 +18,7 @@ const HeaderContent = memo(function HeaderContent({ name }: { name?: string }) {
     >
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         <Link href="/" className="font-bold flex items-center gap-4">
-          <Image 
-            src="/logo.png" 
-            alt="Logo" 
-            width={32} 
-            height={32}
-            priority
-          />
+          <Image src="/logo.png" alt="Logo" width={32} height={32} priority />
           {name || "Portfolio"}
         </Link>
 
@@ -34,9 +28,9 @@ const HeaderContent = memo(function HeaderContent({ name }: { name?: string }) {
         </div>
       </div>
     </motion.header>
-  )
-})
+  );
+});
 
 export function Header({ name }: { name?: string }) {
-  return <HeaderContent name={name} />
+  return <HeaderContent name={name} />;
 }

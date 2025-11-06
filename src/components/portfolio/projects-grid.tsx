@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo, memo } from "react"
-import type { Project } from "@/lib/firebase/types"
-import { ProjectCard } from "./project-card"
-import { Button } from "@/components/ui/button"
-import { getAllTechnologies } from "@/lib/firebase/services/technologies"
-import { useTranslations } from "@/i18n/client"
-import { motion } from "framer-motion"
-import { fadeInUp, staggerContainer, smooth } from "@/lib/animations"
+import { motion } from "framer-motion";
+import { memo, useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/i18n/client";
+import { fadeInUp, smooth, staggerContainer } from "@/lib/animations";
+import { getAllTechnologies } from "@/lib/firebase/services/technologies";
+import type { Project } from "@/lib/firebase/types";
+import { ProjectCard } from "./project-card";
 
 interface ProjectsGridProps {
-  projects: Project[]
+  projects: Project[];
 }
 
 const TechFilter = memo(function TechFilter({
@@ -18,11 +18,11 @@ const TechFilter = memo(function TechFilter({
   selected,
   onSelect,
 }: {
-  technologies: Array<{ id: string; name: string; count: number }>
-  selected: string
-  onSelect: (id: string) => void
+  technologies: Array<{ id: string; name: string; count: number }>;
+  selected: string;
+  onSelect: (id: string) => void;
 }) {
-  const t = useTranslations()
+  const t = useTranslations();
 
   return (
     <motion.div
@@ -45,7 +45,11 @@ const TechFilter = memo(function TechFilter({
       </motion.div>
 
       {technologies.map((tech, index) => (
-        <motion.div key={tech.id} variants={fadeInUp} transition={{ delay: index * 0.05 }}>
+        <motion.div
+          key={tech.id}
+          variants={fadeInUp}
+          transition={{ delay: index * 0.05 }}
+        >
           <Button
             variant={selected === tech.id ? "default" : "outline"}
             onClick={() => onSelect(tech.id)}
@@ -57,41 +61,48 @@ const TechFilter = memo(function TechFilter({
         </motion.div>
       ))}
     </motion.div>
-  )
-})
+  );
+});
 
 export function ProjectsGrid({ projects }: ProjectsGridProps) {
-  const t = useTranslations()
-  const [selectedTech, setSelectedTech] = useState<string>("all")
-  const [topTechnologies, setTopTechnologies] = useState<Array<{ id: string; name: string; count: number }>>([])
-  const [technologyMap, setTechnologyMap] = useState<Record<string, string>>({})
+  const t = useTranslations();
+  const [selectedTech, setSelectedTech] = useState<string>("all");
+  const [topTechnologies, setTopTechnologies] = useState<
+    Array<{ id: string; name: string; count: number }>
+  >([]);
+  const [technologyMap, setTechnologyMap] = useState<Record<string, string>>(
+    {},
+  );
 
   useEffect(() => {
     getAllTechnologies().then((techs) => {
-      const sorted = [...techs].sort((a, b) => b.usageCount - a.usageCount).slice(0, 8)
+      const sorted = [...techs]
+        .sort((a, b) => b.usageCount - a.usageCount)
+        .slice(0, 8);
 
       setTopTechnologies(
         sorted.map((t) => ({
           id: t.id,
           name: t.name,
           count: t.usageCount,
-        }))
-      )
+        })),
+      );
 
-      const map: Record<string, string> = {}
+      const map: Record<string, string> = {};
       techs.forEach((t) => {
-        map[t.id] = t.name
-      })
-      setTechnologyMap(map)
-    })
-  }, [])
+        map[t.id] = t.name;
+      });
+      setTechnologyMap(map);
+    });
+  }, []);
 
   const filteredProjects = useMemo(() => {
-    if (selectedTech === "all") return projects
+    if (selectedTech === "all") return projects;
     return projects.filter(
-      (p) => Array.isArray(p.technologies) && p.technologies.includes(selectedTech)
-    )
-  }, [projects, selectedTech])
+      (p) =>
+        Array.isArray(p.technologies) && p.technologies.includes(selectedTech),
+    );
+  }, [projects, selectedTech]);
 
   return (
     <section id="projects" className="py-16 px-4">
@@ -146,5 +157,5 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
         )}
       </div>
     </section>
-  )
+  );
 }

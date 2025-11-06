@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import type { Project } from "@/lib/firebase/types"
-import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Github } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { scaleIn } from "@/lib/animations"
-import { useI18n } from "@/i18n/client"
-import { memo } from "react"
+import { motion } from "framer-motion";
+import { ExternalLink, Github } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { memo } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n/client";
+import { scaleIn } from "@/lib/animations";
+import type { Project } from "@/lib/firebase/types";
 
 interface ProjectCardProps {
-  project: Project
-  index?: number
-  technologyMap?: Record<string, string>
+  project: Project;
+  index?: number;
+  technologyMap?: Record<string, string>;
 }
 
-export const ProjectCard = memo(function ProjectCard({ 
-  project, 
-  index = 0, 
-  technologyMap 
+export const ProjectCard = memo(function ProjectCard({
+  project,
+  index = 0,
+  technologyMap,
 }: ProjectCardProps) {
-  const { locale } = useI18n()
+  const { locale } = useI18n();
 
-  const title = project.title[locale] || "Project Title"
-  const shortDesc = project.shortDescription[locale] || "Project Description"
+  const title = project.title[locale] || "Project Title";
+  const shortDesc = project.shortDescription[locale] || "Project Description";
 
   return (
     <motion.article
@@ -70,7 +70,7 @@ export const ProjectCard = memo(function ProjectCard({
 
           <div className="flex flex-wrap gap-2">
             {project.technologies.slice(0, 4).map((techId) => {
-              const label = technologyMap?.[techId] ?? techId
+              const label = technologyMap?.[techId] ?? techId;
               return (
                 <Badge
                   key={techId}
@@ -79,7 +79,7 @@ export const ProjectCard = memo(function ProjectCard({
                 >
                   {label}
                 </Badge>
-              )
+              );
             })}
             {project.technologies.length > 4 && (
               <Badge variant="secondary" className="text-xs">
@@ -97,10 +97,10 @@ export const ProjectCard = memo(function ProjectCard({
                 onClick={(e) => e.stopPropagation()}
                 className="hover:scale-110 transition-transform"
               >
-                <a 
-                  href={project.githubUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={project.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Ver código no GitHub"
                 >
                   <Github className="h-4 w-4" />
@@ -115,10 +115,10 @@ export const ProjectCard = memo(function ProjectCard({
                 onClick={(e) => e.stopPropagation()}
                 className="hover:scale-110 transition-transform"
               >
-                <a 
-                  href={project.liveUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label="Ver projeto ao vivo"
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -129,5 +129,5 @@ export const ProjectCard = memo(function ProjectCard({
         </div>
       </Link>
     </motion.article>
-  )
-})
+  );
+});

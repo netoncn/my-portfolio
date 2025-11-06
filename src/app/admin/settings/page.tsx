@@ -1,6 +1,6 @@
-import { AuthGuard } from "@/components/auth/auth-guard"
-import { AdminHeader } from "@/components/admin/admin-header"
-import { SettingsForm } from "@/components/admin/settings-form"
+import { AdminHeader } from "@/components/admin/admin-header";
+import { SettingsForm } from "@/components/admin/settings-form";
+import { AuthGuard } from "@/components/auth/auth-guard";
 
 export default function AdminSettingsPage() {
   return (
@@ -9,12 +9,16 @@ export default function AdminSettingsPage() {
         <AdminHeader />
         <main className="max-w-4xl mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Configurações do Portfólio</h1>
-            <p className="text-muted-foreground">Configure suas informações pessoais e links de contato</p>
+            <h1 className="text-3xl font-bold mb-2">
+              Configurações do Portfólio
+            </h1>
+            <p className="text-muted-foreground">
+              Configure suas informações pessoais e links de contato
+            </p>
           </div>
           <SettingsForm />
         </main>
       </div>
     </AuthGuard>
-  )
+  );
 }

@@ -1,25 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import type { Project, ProjectCategory, ProjectStatus, MultilingualText } from "@/lib/firebase/types"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Combobox } from "@/components/ui/combobox"
-import { X } from "lucide-react"
-import { createProject, updateProject, generateSlug } from "@/lib/firebase/services/admin-projects"
-import { getAllTechnologies, createTechnology } from "@/lib/firebase/services/technologies"
-import { toast } from "sonner"
+import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  createProject,
+  generateSlug,
+  updateProject,
+} from "@/lib/firebase/services/admin-projects";
+import {
+  createTechnology,
+  getAllTechnologies,
+} from "@/lib/firebase/services/technologies";
+import type {
+  MultilingualText,
+  Project,
+  ProjectCategory,
+  ProjectStatus,
+} from "@/lib/firebase/types";
 
 interface ProjectFormProps {
-  project?: Project
+  project?: Project;
 }
 
 const categories: { value: ProjectCategory; label: string }[] = [
@@ -29,139 +47,160 @@ const categories: { value: ProjectCategory; label: string }[] = [
   { value: "api", label: "API" },
   { value: "library", label: "Biblioteca" },
   { value: "other", label: "Outros" },
-]
+];
 
 const statuses: { value: ProjectStatus; label: string }[] = [
   { value: "draft", label: "Rascunho" },
   { value: "published", label: "Publicado" },
   { value: "archived", label: "Arquivado" },
-]
+];
 
 const emptyMultilingualText = (): MultilingualText => ({
   "en-US": "",
   "pt-BR": "",
   "es-ES": "",
-})
+});
 
 export function ProjectForm({ project }: ProjectFormProps) {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [title, setTitle] = useState<MultilingualText>(project?.title || emptyMultilingualText())
-  const [slug, setSlug] = useState(project?.slug || "")
+  const [title, setTitle] = useState<MultilingualText>(
+    project?.title || emptyMultilingualText(),
+  );
+  const [slug, setSlug] = useState(project?.slug || "");
   const [shortDescription, setShortDescription] = useState<MultilingualText>(
     project?.shortDescription || emptyMultilingualText(),
-  )
+  );
   const [longDescription, setLongDescription] = useState<MultilingualText>(
     project?.longDescription || emptyMultilingualText(),
-  )
-  const [category, setCategory] = useState<ProjectCategory>(project?.category || "web")
-  const [status, setStatus] = useState<ProjectStatus>(project?.status || "draft")
-  const [technologies, setTechnologies] = useState<string[]>(project?.technologies || [])
-  const [githubUrl, setGithubUrl] = useState(project?.githubUrl || "")
-  const [liveUrl, setLiveUrl] = useState(project?.liveUrl || "")
-  const [hasSourceCode, setHasSourceCode] = useState(project?.hasSourceCode ?? true)
-  const [thumbnailUrl, setThumbnailUrl] = useState(project?.thumbnailUrl || "")
-  const [images, setImages] = useState<string[]>(project?.images || [])
-  const [imageInput, setImageInput] = useState("")
-  const [featured, setFeatured] = useState(project?.featured || false)
-  const [order, setOrder] = useState(project?.order || 0)
+  );
+  const [category, setCategory] = useState<ProjectCategory>(
+    project?.category || "web",
+  );
+  const [status, setStatus] = useState<ProjectStatus>(
+    project?.status || "draft",
+  );
+  const [technologies, setTechnologies] = useState<string[]>(
+    project?.technologies || [],
+  );
+  const [githubUrl, setGithubUrl] = useState(project?.githubUrl || "");
+  const [liveUrl, setLiveUrl] = useState(project?.liveUrl || "");
+  const [hasSourceCode, setHasSourceCode] = useState(
+    project?.hasSourceCode ?? true,
+  );
+  const [thumbnailUrl, setThumbnailUrl] = useState(project?.thumbnailUrl || "");
+  const [images, setImages] = useState<string[]>(project?.images || []);
+  const [imageInput, setImageInput] = useState("");
+  const [featured, setFeatured] = useState(project?.featured || false);
+  const [order, setOrder] = useState(project?.order || 0);
 
-  const [availableTechnologies, setAvailableTechnologies] = useState<Array<{ value: string; label: string }>>([])
-  const [selectedTechForAdd, setSelectedTechForAdd] = useState("")
-  const [newTechInput, setNewTechInput] = useState("")
+  const [availableTechnologies, setAvailableTechnologies] = useState<
+    Array<{ value: string; label: string }>
+  >([]);
+  const [selectedTechForAdd, setSelectedTechForAdd] = useState("");
+  const [newTechInput, setNewTechInput] = useState("");
 
   useEffect(() => {
     getAllTechnologies().then((techs) => {
-      setAvailableTechnologies(techs.map((t) => ({ value: t.id, label: t.name })))
-    })
-  }, [])
+      setAvailableTechnologies(
+        techs.map((t) => ({ value: t.id, label: t.name })),
+      );
+    });
+  }, []);
 
   useEffect(() => {
     if (!project && title["pt-BR"]) {
-      setSlug(generateSlug(title["pt-BR"]))
+      setSlug(generateSlug(title["pt-BR"]));
     }
-  }, [title, project])
+  }, [title, project]);
 
   const getTechLabel = (id: string) =>
-    availableTechnologies.find((t) => t.value === id)?.label ?? id
+    availableTechnologies.find((t) => t.value === id)?.label ?? id;
 
   const handleAddTechnology = async () => {
     if (selectedTechForAdd) {
       if (!technologies.includes(selectedTechForAdd)) {
-        setTechnologies((prev) => [...prev, selectedTechForAdd])
+        setTechnologies((prev) => [...prev, selectedTechForAdd]);
       }
-      setSelectedTechForAdd("")
-      return
+      setSelectedTechForAdd("");
+      return;
     }
 
-    const trimmed = newTechInput.trim()
-    if (!trimmed) return
+    const trimmed = newTechInput.trim();
+    if (!trimmed) return;
 
     const existing = availableTechnologies.find(
       (t) => t.label.toLowerCase() === trimmed.toLowerCase(),
-    )
+    );
 
-    let techId: string
+    let techId: string;
 
     if (existing) {
-      techId = existing.value
+      techId = existing.value;
     } else {
       techId = await createTechnology({
         name: trimmed,
         slug: generateSlug(trimmed),
-      })
+      });
 
-      const techs = await getAllTechnologies()
-      setAvailableTechnologies(techs.map((t) => ({ value: t.id, label: t.name })))
+      const techs = await getAllTechnologies();
+      setAvailableTechnologies(
+        techs.map((t) => ({ value: t.id, label: t.name })),
+      );
     }
 
     if (!technologies.includes(techId)) {
-      setTechnologies((prev) => [...prev, techId])
+      setTechnologies((prev) => [...prev, techId]);
     }
 
-    setNewTechInput("")
-  }
+    setNewTechInput("");
+  };
 
   const handleRemoveTechnology = (tech: string) => {
-    setTechnologies(technologies.filter((t) => t !== tech))
-  }
+    setTechnologies(technologies.filter((t) => t !== tech));
+  };
 
   const handleAddImage = () => {
     if (imageInput.trim() && !images.includes(imageInput.trim())) {
-      setImages([...images, imageInput.trim()])
-      setImageInput("")
+      setImages([...images, imageInput.trim()]);
+      setImageInput("");
     }
-  }
+  };
 
   const handleRemoveImage = (image: string) => {
-    setImages(images.filter((i) => i !== image))
-  }
+    setImages(images.filter((i) => i !== image));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const titleValid = title["en-US"].trim() && title["pt-BR"].trim() && title["es-ES"].trim()
+    const titleValid =
+      title["en-US"].trim() && title["pt-BR"].trim() && title["es-ES"].trim();
     const shortDescValid =
-      shortDescription["en-US"].trim() && shortDescription["pt-BR"].trim() && shortDescription["es-ES"].trim()
+      shortDescription["en-US"].trim() &&
+      shortDescription["pt-BR"].trim() &&
+      shortDescription["es-ES"].trim();
     const longDescValid =
-      longDescription["en-US"].trim() && longDescription["pt-BR"].trim() && longDescription["es-ES"].trim()
+      longDescription["en-US"].trim() &&
+      longDescription["pt-BR"].trim() &&
+      longDescription["es-ES"].trim();
 
     if (!titleValid || !slug.trim() || !shortDescValid || !longDescValid) {
       toast.error("Campos obrigatórios", {
         description: "Preencha título, slug e descrições em todos os idiomas",
-      })
-      return
+      });
+      return;
     }
 
     if (technologies.length === 0) {
       toast.error("Tecnologias obrigatórias", {
         description: "Adicione pelo menos uma tecnologia",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       const formData = {
@@ -179,26 +218,27 @@ export function ProjectForm({ project }: ProjectFormProps) {
         images: images.length > 0 ? images : undefined,
         featured,
         order,
-      }
+      };
 
       if (project) {
-        await updateProject(project.id, formData)
-        toast.success("Projeto atualizado com sucesso!")
+        await updateProject(project.id, formData);
+        toast.success("Projeto atualizado com sucesso!");
       } else {
-        await createProject(formData)
-        toast.success("Projeto criado com sucesso!")
+        await createProject(formData);
+        toast.success("Projeto criado com sucesso!");
       }
 
-      router.push("/admin")
-      router.refresh()
+      router.push("/admin");
+      router.refresh();
     } catch (error) {
       toast.error("Erro ao salvar projeto", {
-        description: error instanceof Error ? error.message : "Erro desconhecido",
-      })
+        description:
+          error instanceof Error ? error.message : "Erro desconhecido",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -239,8 +279,16 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="slug">Slug (URL amigável) *</Label>
-        <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="meu-projeto" required />
-        <p className="text-sm text-muted-foreground">Gerado automaticamente a partir do título em português</p>
+        <Input
+          id="slug"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          placeholder="meu-projeto"
+          required
+        />
+        <p className="text-sm text-muted-foreground">
+          Gerado automaticamente a partir do título em português
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -254,7 +302,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <TabsContent value="pt-BR" className="mt-3">
             <Textarea
               value={shortDescription["pt-BR"]}
-              onChange={(e) => setShortDescription({ ...shortDescription, "pt-BR": e.target.value })}
+              onChange={(e) =>
+                setShortDescription({
+                  ...shortDescription,
+                  "pt-BR": e.target.value,
+                })
+              }
               placeholder="Breve descrição do projeto em português"
               rows={3}
               required
@@ -263,7 +316,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <TabsContent value="en-US" className="mt-3">
             <Textarea
               value={shortDescription["en-US"]}
-              onChange={(e) => setShortDescription({ ...shortDescription, "en-US": e.target.value })}
+              onChange={(e) =>
+                setShortDescription({
+                  ...shortDescription,
+                  "en-US": e.target.value,
+                })
+              }
               placeholder="Brief project description in English"
               rows={3}
               required
@@ -272,7 +330,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <TabsContent value="es-ES" className="mt-3">
             <Textarea
               value={shortDescription["es-ES"]}
-              onChange={(e) => setShortDescription({ ...shortDescription, "es-ES": e.target.value })}
+              onChange={(e) =>
+                setShortDescription({
+                  ...shortDescription,
+                  "es-ES": e.target.value,
+                })
+              }
               placeholder="Breve descripción del proyecto en español"
               rows={3}
               required
@@ -292,7 +355,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <TabsContent value="pt-BR" className="mt-3">
             <Textarea
               value={longDescription["pt-BR"]}
-              onChange={(e) => setLongDescription({ ...longDescription, "pt-BR": e.target.value })}
+              onChange={(e) =>
+                setLongDescription({
+                  ...longDescription,
+                  "pt-BR": e.target.value,
+                })
+              }
               placeholder="Descrição detalhada do projeto em português"
               rows={6}
               required
@@ -301,7 +369,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <TabsContent value="en-US" className="mt-3">
             <Textarea
               value={longDescription["en-US"]}
-              onChange={(e) => setLongDescription({ ...longDescription, "en-US": e.target.value })}
+              onChange={(e) =>
+                setLongDescription({
+                  ...longDescription,
+                  "en-US": e.target.value,
+                })
+              }
               placeholder="Detailed project description in English"
               rows={6}
               required
@@ -310,7 +383,12 @@ export function ProjectForm({ project }: ProjectFormProps) {
           <TabsContent value="es-ES" className="mt-3">
             <Textarea
               value={longDescription["es-ES"]}
-              onChange={(e) => setLongDescription({ ...longDescription, "es-ES": e.target.value })}
+              onChange={(e) =>
+                setLongDescription({
+                  ...longDescription,
+                  "es-ES": e.target.value,
+                })
+              }
               placeholder="Descripción detallada del proyecto en español"
               rows={6}
               required
@@ -322,7 +400,10 @@ export function ProjectForm({ project }: ProjectFormProps) {
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="category">Categoria</Label>
-          <Select value={category} onValueChange={(value) => setCategory(value as ProjectCategory)}>
+          <Select
+            value={category}
+            onValueChange={(value) => setCategory(value as ProjectCategory)}
+          >
             <SelectTrigger id="category">
               <SelectValue />
             </SelectTrigger>
@@ -338,7 +419,10 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="status">Status</Label>
-          <Select value={status} onValueChange={(value) => setStatus(value as ProjectStatus)}>
+          <Select
+            value={status}
+            onValueChange={(value) => setStatus(value as ProjectStatus)}
+          >
             <SelectTrigger id="status">
               <SelectValue />
             </SelectTrigger>
@@ -381,14 +465,18 @@ export function ProjectForm({ project }: ProjectFormProps) {
             onChange={(e) => setNewTechInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                e.preventDefault()
-                handleAddTechnology()
+                e.preventDefault();
+                handleAddTechnology();
               }
             }}
             placeholder="Ou digite uma nova..."
             className="flex-1"
           />
-          <Button type="button" onClick={handleAddTechnology} variant="secondary">
+          <Button
+            type="button"
+            onClick={handleAddTechnology}
+            variant="secondary"
+          >
             Adicionar
           </Button>
         </div>
@@ -433,8 +521,14 @@ export function ProjectForm({ project }: ProjectFormProps) {
       </div>
 
       <div className="flex items-center space-x-2">
-        <Switch id="hasSourceCode" checked={hasSourceCode} onCheckedChange={setHasSourceCode} />
-        <Label htmlFor="hasSourceCode">Código fonte disponível publicamente</Label>
+        <Switch
+          id="hasSourceCode"
+          checked={hasSourceCode}
+          onCheckedChange={setHasSourceCode}
+        />
+        <Label htmlFor="hasSourceCode">
+          Código fonte disponível publicamente
+        </Label>
       </div>
 
       <div className="space-y-2">
@@ -457,8 +551,8 @@ export function ProjectForm({ project }: ProjectFormProps) {
             onChange={(e) => setImageInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                e.preventDefault()
-                handleAddImage()
+                e.preventDefault();
+                handleAddImage();
               }
             }}
             placeholder="https://exemplo.com/imagem.jpg"
@@ -471,9 +565,17 @@ export function ProjectForm({ project }: ProjectFormProps) {
         {images.length > 0 && (
           <div className="space-y-2">
             {images.map((image, index) => (
-              <div key={index} className="flex items-center gap-2 p-2 border rounded-lg">
+              <div
+                key={index}
+                className="flex items-center gap-2 p-2 border rounded-lg"
+              >
                 <span className="text-sm flex-1 truncate">{image}</span>
-                <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveImage(image)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemoveImage(image)}
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -483,18 +585,31 @@ export function ProjectForm({ project }: ProjectFormProps) {
       </div>
 
       <div className="flex items-center space-x-2">
-        <Switch id="featured" checked={featured} onCheckedChange={setFeatured} />
+        <Switch
+          id="featured"
+          checked={featured}
+          onCheckedChange={setFeatured}
+        />
         <Label htmlFor="featured">Projeto em destaque na página inicial</Label>
       </div>
 
       <div className="flex gap-4 pt-6 border-t">
         <Button type="submit" disabled={isSubmitting} size="lg">
-          {isSubmitting ? "Salvando..." : project ? "Atualizar Projeto" : "Criar Projeto"}
+          {isSubmitting
+            ? "Salvando..."
+            : project
+              ? "Atualizar Projeto"
+              : "Criar Projeto"}
         </Button>
-        <Button type="button" variant="outline" size="lg" onClick={() => router.push("/admin")}>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          onClick={() => router.push("/admin")}
+        >
           Cancelar
         </Button>
       </div>
     </form>
-  )
+  );
 }

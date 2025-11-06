@@ -1,16 +1,16 @@
-import type React from "react"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { getSettings } from "@/lib/firebase/services/settings"
+import type React from "react";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
+import { getSettings } from "@/lib/firebase/services/settings";
 
-export const revalidate = 3600
+export const revalidate = 3600;
 
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const settings = await getSettings()
+  const settings = await getSettings();
 
   return (
     <>
@@ -18,5 +18,5 @@ export default async function RootLayout({
       <main className="min-h-screen">{children}</main>
       <Footer />
     </>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-import { AuthGuard } from "@/components/auth/auth-guard"
-import { AdminHeader } from "@/components/admin/admin-header"
-import { ProjectsTable } from "@/components/admin/projects-table"
-import { getAllProjects } from "@/lib/firebase/services/admin-projects"
+import { AdminHeader } from "@/components/admin/admin-header";
+import { ProjectsTable } from "@/components/admin/projects-table";
+import { AuthGuard } from "@/components/auth/auth-guard";
+import { getAllProjects } from "@/lib/firebase/services/admin-projects";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const projects = await getAllProjects()
+  const projects = await getAllProjects();
 
   return (
     <AuthGuard>
@@ -17,7 +17,9 @@ export default async function AdminDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Projetos</h1>
-                <p className="text-muted-foreground mt-1">Gerencie seus projetos do portfólio</p>
+                <p className="text-muted-foreground mt-1">
+                  Gerencie seus projetos do portfólio
+                </p>
               </div>
             </div>
             <ProjectsTable projects={projects} />
@@ -25,5 +27,5 @@ export default async function AdminDashboardPage() {
         </main>
       </div>
     </AuthGuard>
-  )
+  );
 }

@@ -1,24 +1,34 @@
-import { generateText } from "ai"
-import { openai } from "@ai-sdk/openai"
+import { openai } from "@ai-sdk/openai";
+import { generateText } from "ai";
 
-export const runtime = "nodejs"
-export const dynamic = "force-dynamic"
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 interface GenerateDescriptionRequest {
-  title: string
-  category: string
-  technologies: string[]
-  type: "short" | "long",
-  previousText?: string | undefined
-  githubUrl?: string | undefined
+  title: string;
+  category: string;
+  technologies: string[];
+  type: "short" | "long";
+  previousText?: string | undefined;
+  githubUrl?: string | undefined;
 }
 
 export async function POST(req: Request) {
   try {
-    const { title, category, technologies, type, previousText, githubUrl }: GenerateDescriptionRequest = await req.json()
+    const {
+      title,
+      category,
+      technologies,
+      type,
+      previousText,
+      githubUrl,
+    }: GenerateDescriptionRequest = await req.json();
 
     if (!title || !category || !technologies || !type) {
-      return Response.json({ error: "Campos obrigatórios faltando" }, { status: 400 })
+      return Response.json(
+        { error: "Campos obrigatórios faltando" },
+        { status: 400 },
+      );
     }
 
     const prompt =
@@ -48,17 +58,17 @@ export async function POST(req: Request) {
          - Tecnologias utilizadas e por que foram escolhidas
          - Desafios técnicos superados ou aprendizados
          - Estar em português brasileiro
-         - Ser profissional mas acessível`
+         - Ser profissional mas acessível`;
 
     const { text } = await generateText({
       model: openai("gpt-4.1"),
       prompt,
       temperature: 0.7,
-    })
+    });
 
-    return Response.json({ description: text.trim() })
+    return Response.json({ description: text.trim() });
   } catch (error) {
-    console.error("[v0] Generate description error:", error)
-    return Response.json({ error: "Erro ao gerar descrição" }, { status: 500 })
+    console.error("[v0] Generate description error:", error);
+    return Response.json({ error: "Erro ao gerar descrição" }, { status: 500 });
   }
 }

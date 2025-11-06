@@ -1,0 +1,16 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+
+# Host
+Host: https://netoncn.com.br
+
+# Sitemaps
+Sitemap: https://netoncn.com.br/sitemap.xml
