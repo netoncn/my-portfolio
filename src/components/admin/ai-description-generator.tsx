@@ -4,6 +4,7 @@ import { Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/i18n/client";
 
 interface AIDescriptionGeneratorProps {
   title: string;
@@ -25,18 +26,19 @@ export function AIDescriptionGenerator({
   onGenerated,
 }: AIDescriptionGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const t = useTranslations();
 
   const handleGenerate = async () => {
     if (!title.trim()) {
-      toast.error("Título necessário", {
-        description: "Preencha o título do projeto primeiro",
+      toast.error(t("admin.ai.titleNeeded"), {
+        description: t("admin.ai.titleNeededDesc"),
       });
       return;
     }
 
     if (technologies.length === 0) {
-      toast.error("Tecnologias necessárias", {
-        description: "Adicione pelo menos uma tecnologia",
+      toast.error(t("admin.ai.technologiesNeeded"), {
+        description: t("admin.ai.technologiesNeededDesc"),
       });
       return;
     }
@@ -58,19 +60,19 @@ export function AIDescriptionGenerator({
       });
 
       if (!response.ok) {
-        throw new Error("Falha ao gerar descrição");
+        throw new Error(t("admin.ai.generationFailed"));
       }
 
       const { description } = await response.json();
       onGenerated(description);
 
-      toast.success("Descrição gerada", {
-        description: "A IA criou uma descrição para você",
+      toast.success(t("admin.ai.descriptionGenerated"), {
+        description: t("admin.ai.descriptionGeneratedDesc"),
       });
     } catch (error) {
-      toast.error("Erro ao gerar", {
+      toast.error(t("admin.ai.error"), {
         description:
-          error instanceof Error ? error.message : "Erro desconhecido",
+          error instanceof Error ? error.message : t("common.error"),
       });
     } finally {
       setIsGenerating(false);
@@ -88,12 +90,12 @@ export function AIDescriptionGenerator({
       {isGenerating ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Gerando...
+          {t("admin.ai.generating")}
         </>
       ) : (
         <>
           <Sparkles className="mr-2 h-4 w-4" />
-          Gerar com IA
+          {t("admin.ai.generateDescription")}
         </>
       )}
     </Button>

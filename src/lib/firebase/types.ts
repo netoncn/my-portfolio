@@ -28,8 +28,8 @@ export interface Project {
   status: ProjectStatus;
 
   technologies: string[];
-  githubUrl?: string;
-  liveUrl?: string;
+  githubUrl?: string | null | undefined;
+  liveUrl?: string | null | undefined;
   hasSourceCode: boolean;
 
   thumbnailUrl?: string;
@@ -90,8 +90,8 @@ export interface ProjectFormData {
   category: ProjectCategory;
   status: ProjectStatus;
   technologies: string[];
-  githubUrl?: string;
-  liveUrl?: string;
+  githubUrl?: string | null | undefined;
+  liveUrl?: string | null | undefined;
   hasSourceCode: boolean;
   thumbnailUrl?: string;
   images?: string[];

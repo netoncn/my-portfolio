@@ -91,9 +91,17 @@ export async function updateProject(
   try {
     const oldProject = await getProjectByIdAdmin(id);
 
+    const sanitizedData: Partial<ProjectFormData> = { ...data };
+    if (data.githubUrl === null || data.githubUrl === undefined) {
+      sanitizedData.githubUrl = "";
+    }
+    if (data.liveUrl === null || data.liveUrl === undefined) {
+      sanitizedData.liveUrl = "";
+    }
+
     const docRef = doc(db, COLLECTIONS.PROJECTS, id);
     await updateDoc(docRef, {
-      ...data,
+      ...sanitizedData,
       updatedAt: serverTimestamp(),
     });
 

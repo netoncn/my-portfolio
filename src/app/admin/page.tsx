@@ -1,3 +1,4 @@
+import AdminDashboardClient from "@/components/admin/admin-dashboard";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { ProjectsTable } from "@/components/admin/projects-table";
 import { AuthGuard } from "@/components/auth/auth-guard";
@@ -12,19 +13,7 @@ export default async function AdminDashboardPage() {
     <AuthGuard>
       <div className="min-h-screen bg-background">
         <AdminHeader />
-        <main className="max-w-7xl mx-auto px-4 py-8">
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Projetos</h1>
-                <p className="text-muted-foreground mt-1">
-                  Gerencie seus projetos do portfólio
-                </p>
-              </div>
-            </div>
-            <ProjectsTable projects={projects} />
-          </div>
-        </main>
+        <AdminDashboardClient projects={projects} />
       </div>
     </AuthGuard>
   );

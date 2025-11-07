@@ -1,8 +1,13 @@
+"use client";
+
 import { AdminHeader } from "@/components/admin/admin-header";
 import { ProjectForm } from "@/components/admin/project-form";
 import { AuthGuard } from "@/components/auth/auth-guard";
+import { useTranslations } from "@/i18n/client";
 
 export default function NewProjectPage() {
+  const t = useTranslations();
+  
   return (
     <AuthGuard>
       <div className="min-h-screen bg-background">
@@ -11,10 +16,10 @@ export default function NewProjectPage() {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
-                Novo Projeto
+                {t("admin.projects.new")}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Adicione um novo projeto ao seu portfólio
+                {t("admin.projects.newSubtitle")}
               </p>
             </div>
             <ProjectForm />

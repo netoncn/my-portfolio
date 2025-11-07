@@ -7,6 +7,7 @@ import { useTranslations } from "@/i18n/client";
 import { fadeInUp, smooth, staggerContainer } from "@/lib/animations";
 import { getAllTechnologies } from "@/lib/firebase/services/technologies";
 import type { Project } from "@/lib/firebase/types";
+import { FeaturedProjectCard } from "./featured-project-card";
 import { ProjectCard } from "./project-card";
 
 interface ProjectsGridProps {
@@ -104,6 +105,16 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
     );
   }, [projects, selectedTech]);
 
+  const featuredProjects = useMemo(
+    () => filteredProjects.filter((p) => p.featured),
+    [filteredProjects],
+  );
+
+  const regularProjects = useMemo(
+    () => filteredProjects.filter((p) => !p.featured),
+    [filteredProjects],
+  );
+
   return (
     <section id="projects" className="py-16 px-4">
       <div className="container mx-auto space-y-12">
@@ -136,24 +147,60 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
             animate={{ opacity: 1 }}
             transition={smooth as any}
           >
-            <p className="text-muted-foreground">{t("projects.noProjects")}</p>
+            <p className="text-muted-foreground">
+              {t("portfolio.projects.noProjects")}
+            </p>
           </motion.div>
         ) : (
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial="initial"
-            animate="animate"
-            variants={staggerContainer}
-          >
-            {filteredProjects.map((project, index) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                index={index}
-                technologyMap={technologyMap}
-              />
-            ))}
-          </motion.div>
+          <div className="space-y-16">
+            {featuredProjects.length > 0 && (
+              <motion.div
+                initial="initial"
+                animate="animate"
+                variants={staggerContainer}
+                className="space-y-6"
+              >
+                <h3 className="text-2xl font-bold tracking-tight">
+                  ⭐ {t("portfolio.projects.featuredProjects")}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {featuredProjects.map((project, index) => (
+                    <FeaturedProjectCard
+                      key={project.id}
+                      project={project}
+                      index={index}
+                      technologyMap={technologyMap}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {regularProjects.length > 0 && (
+              <motion.div
+                initial="initial"
+                animate="animate"
+                variants={staggerContainer}
+                className="space-y-6"
+              >
+                {featuredProjects.length > 0 && (
+                  <h3 className="text-2xl font-bold tracking-tight">
+                    {t("common.all")} {t("portfolio.projects.title")}
+                  </h3>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {regularProjects.map((project, index) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      index={index}
+                      technologyMap={technologyMap}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </div>
         )}
       </div>
     </section>

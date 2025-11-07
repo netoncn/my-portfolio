@@ -20,6 +20,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslations } from "@/i18n/client";
 import {
   createProject,
   generateSlug,
@@ -40,21 +41,6 @@ interface ProjectFormProps {
   project?: Project;
 }
 
-const categories: { value: ProjectCategory; label: string }[] = [
-  { value: "web", label: "Web" },
-  { value: "mobile", label: "Mobile" },
-  { value: "desktop", label: "Desktop" },
-  { value: "api", label: "API" },
-  { value: "library", label: "Biblioteca" },
-  { value: "other", label: "Outros" },
-];
-
-const statuses: { value: ProjectStatus; label: string }[] = [
-  { value: "draft", label: "Rascunho" },
-  { value: "published", label: "Publicado" },
-  { value: "archived", label: "Arquivado" },
-];
-
 const emptyMultilingualText = (): MultilingualText => ({
   "en-US": "",
   "pt-BR": "",
@@ -63,7 +49,23 @@ const emptyMultilingualText = (): MultilingualText => ({
 
 export function ProjectForm({ project }: ProjectFormProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const categories: { value: ProjectCategory; label: string }[] = [
+    { value: "web", label: t("admin.projects.form.categories.web") },
+    { value: "mobile", label: t("admin.projects.form.categories.mobile") },
+    { value: "desktop", label: t("admin.projects.form.categories.desktop") },
+    { value: "api", label: t("admin.projects.form.categories.api") },
+    { value: "library", label: t("admin.projects.form.categories.library") },
+    { value: "other", label: t("admin.projects.form.categories.other") },
+  ];
+
+  const statuses: { value: ProjectStatus; label: string }[] = [
+    { value: "draft", label: t("admin.projects.form.statuses.draft") },
+    { value: "published", label: t("admin.projects.form.statuses.published") },
+    { value: "archived", label: t("admin.projects.form.statuses.archived") },
+  ];
 
   const [title, setTitle] = useState<MultilingualText>(
     project?.title || emptyMultilingualText(),
@@ -187,15 +189,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
       longDescription["es-ES"].trim();
 
     if (!titleValid || !slug.trim() || !shortDescValid || !longDescValid) {
-      toast.error("Campos obrigatórios", {
-        description: "Preencha título, slug e descrições em todos os idiomas",
+      toast.error(t("admin.projects.requiredFields"), {
+        description: t("admin.projects.requiredFieldsDesc"),
       });
       return;
     }
 
     if (technologies.length === 0) {
-      toast.error("Tecnologias obrigatórias", {
-        description: "Adicione pelo menos uma tecnologia",
+      toast.error(t("admin.projects.technologiesRequired"), {
+        description: t("admin.projects.technologiesRequiredDesc"),
       });
       return;
     }
@@ -222,18 +224,18 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       if (project) {
         await updateProject(project.id, formData);
-        toast.success("Projeto atualizado com sucesso!");
+        toast.success(t("admin.projects.updateSuccess"));
       } else {
         await createProject(formData);
-        toast.success("Projeto criado com sucesso!");
+        toast.success(t("admin.projects.createSuccess"));
       }
 
       router.push("/admin");
       router.refresh();
     } catch (error) {
-      toast.error("Erro ao salvar projeto", {
+      toast.error(t("admin.projects.errorSaving"), {
         description:
-          error instanceof Error ? error.message : "Erro desconhecido",
+          error instanceof Error ? error.message : t("common.error"),
       });
     } finally {
       setIsSubmitting(false);
@@ -243,7 +245,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="space-y-3">
-        <Label>Título do Projeto *</Label>
+        <Label>{t("admin.projects.form.title")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pt-BR">Português</TabsTrigger>
@@ -254,7 +256,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <Input
               value={title["pt-BR"]}
               onChange={(e) => setTitle({ ...title, "pt-BR": e.target.value })}
-              placeholder="Nome do projeto em português"
+              placeholder={t("admin.projects.form.titlePlaceholder.pt")}
               required
             />
           </TabsContent>
@@ -262,7 +264,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <Input
               value={title["en-US"]}
               onChange={(e) => setTitle({ ...title, "en-US": e.target.value })}
-              placeholder="Project name in English"
+              placeholder={t("admin.projects.form.titlePlaceholder.en")}
               required
             />
           </TabsContent>
@@ -270,7 +272,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             <Input
               value={title["es-ES"]}
               onChange={(e) => setTitle({ ...title, "es-ES": e.target.value })}
-              placeholder="Nombre del proyecto en español"
+              placeholder={t("admin.projects.form.titlePlaceholder.es")}
               required
             />
           </TabsContent>
@@ -278,21 +280,21 @@ export function ProjectForm({ project }: ProjectFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="slug">Slug (URL amigável) *</Label>
+        <Label htmlFor="slug">{t("admin.projects.form.slug")} *</Label>
         <Input
           id="slug"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          placeholder="meu-projeto"
+          placeholder={t("admin.projects.form.slugPlaceholder")}
           required
         />
         <p className="text-sm text-muted-foreground">
-          Gerado automaticamente a partir do título em português
+          {t("admin.projects.form.slugDescription")}
         </p>
       </div>
 
       <div className="space-y-3">
-        <Label>Descrição Curta *</Label>
+        <Label>{t("admin.projects.form.shortDescription")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pt-BR">Português</TabsTrigger>
@@ -308,7 +310,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   "pt-BR": e.target.value,
                 })
               }
-              placeholder="Breve descrição do projeto em português"
+              placeholder={t("admin.projects.form.shortDescPlaceholder.pt")}
               rows={3}
               required
             />
@@ -322,7 +324,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   "en-US": e.target.value,
                 })
               }
-              placeholder="Brief project description in English"
+              placeholder={t("admin.projects.form.shortDescPlaceholder.en")}
               rows={3}
               required
             />
@@ -336,7 +338,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   "es-ES": e.target.value,
                 })
               }
-              placeholder="Breve descripción del proyecto en español"
+              placeholder={t("admin.projects.form.shortDescPlaceholder.es")}
               rows={3}
               required
             />
@@ -345,7 +347,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
       </div>
 
       <div className="space-y-3">
-        <Label>Descrição Longa *</Label>
+        <Label>{t("admin.projects.form.longDescription")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pt-BR">Português</TabsTrigger>
@@ -361,7 +363,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   "pt-BR": e.target.value,
                 })
               }
-              placeholder="Descrição detalhada do projeto em português"
+              placeholder={t("admin.projects.form.longDescPlaceholder.pt")}
               rows={6}
               required
             />
@@ -375,7 +377,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   "en-US": e.target.value,
                 })
               }
-              placeholder="Detailed project description in English"
+              placeholder={t("admin.projects.form.longDescPlaceholder.en")}
               rows={6}
               required
             />
@@ -389,7 +391,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                   "es-ES": e.target.value,
                 })
               }
-              placeholder="Descripción detallada del proyecto en español"
+              placeholder={t("admin.projects.form.longDescPlaceholder.es")}
               rows={6}
               required
             />
@@ -399,7 +401,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="category">Categoria</Label>
+          <Label htmlFor="category">{t("admin.projects.form.category")}</Label>
           <Select
             value={category}
             onValueChange={(value) => setCategory(value as ProjectCategory)}
@@ -418,7 +420,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="status">{t("admin.projects.form.status")}</Label>
           <Select
             value={status}
             onValueChange={(value) => setStatus(value as ProjectStatus)}
@@ -437,27 +439,27 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="order">Ordem de Exibição</Label>
+          <Label htmlFor="order">{t("admin.projects.form.order")}</Label>
           <Input
             id="order"
             type="number"
             value={order}
             onChange={(e) => setOrder(Number.parseInt(e.target.value) || 0)}
-            placeholder="0"
+            placeholder={t("admin.projects.form.orderPlaceholder")}
           />
         </div>
       </div>
 
       <div className="space-y-3">
-        <Label>Tecnologias *</Label>
+        <Label>{t("admin.projects.form.technologies")} *</Label>
         <div className="flex gap-2">
           <Combobox
             options={availableTechnologies}
             value={selectedTechForAdd}
             onValueChange={setSelectedTechForAdd}
-            placeholder="Selecione uma tecnologia..."
-            searchPlaceholder="Buscar tecnologia..."
-            emptyText="Nenhuma tecnologia encontrada."
+            placeholder={t("admin.projects.form.selectTechnology")}
+            searchPlaceholder={t("admin.projects.form.searchTechnology")}
+            emptyText={t("admin.projects.form.noTechnologyFound")}
             className="flex-1"
           />
           <Input
@@ -469,7 +471,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
                 handleAddTechnology();
               }
             }}
-            placeholder="Ou digite uma nova..."
+            placeholder={t("admin.projects.form.orTypeNew")}
             className="flex-1"
           />
           <Button
@@ -477,7 +479,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             onClick={handleAddTechnology}
             variant="secondary"
           >
-            Adicionar
+            {t("admin.projects.form.addTechnology")}
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -498,24 +500,26 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="githubUrl">URL do GitHub</Label>
+          <Label htmlFor="githubUrl">
+            {t("admin.projects.form.githubUrlOptional")}
+          </Label>
           <Input
             id="githubUrl"
             type="url"
             value={githubUrl}
             onChange={(e) => setGithubUrl(e.target.value)}
-            placeholder="https://github.com/usuario/projeto"
+            placeholder={t("admin.projects.form.githubPlaceholder")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="liveUrl">URL do Projeto Online</Label>
+          <Label htmlFor="liveUrl">{t("admin.projects.form.liveUrl")}</Label>
           <Input
             id="liveUrl"
             type="url"
             value={liveUrl}
             onChange={(e) => setLiveUrl(e.target.value)}
-            placeholder="https://meuprojeto.com"
+            placeholder={t("admin.projects.form.livePlaceholder")}
           />
         </div>
       </div>
@@ -527,23 +531,25 @@ export function ProjectForm({ project }: ProjectFormProps) {
           onCheckedChange={setHasSourceCode}
         />
         <Label htmlFor="hasSourceCode">
-          Código fonte disponível publicamente
+          {t("admin.projects.form.hasSourceCode")}
         </Label>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="thumbnailUrl">URL da Imagem de Capa</Label>
+        <Label htmlFor="thumbnailUrl">
+          {t("admin.projects.form.thumbnailUrl")}
+        </Label>
         <Input
           id="thumbnailUrl"
           type="url"
           value={thumbnailUrl}
           onChange={(e) => setThumbnailUrl(e.target.value)}
-          placeholder="https://exemplo.com/imagem.jpg"
+          placeholder={t("admin.projects.form.thumbnailPlaceholder")}
         />
       </div>
 
       <div className="space-y-3">
-        <Label>Galeria de Imagens</Label>
+        <Label>{t("admin.projects.form.imageGallery")}</Label>
         <div className="flex gap-2">
           <Input
             type="url"
@@ -555,11 +561,11 @@ export function ProjectForm({ project }: ProjectFormProps) {
                 handleAddImage();
               }
             }}
-            placeholder="https://exemplo.com/imagem.jpg"
+            placeholder={t("admin.projects.form.imageUrlPlaceholder")}
             className="flex-1"
           />
           <Button type="button" onClick={handleAddImage} variant="secondary">
-            Adicionar
+            {t("admin.projects.form.addImage")}
           </Button>
         </div>
         {images.length > 0 && (
@@ -590,16 +596,16 @@ export function ProjectForm({ project }: ProjectFormProps) {
           checked={featured}
           onCheckedChange={setFeatured}
         />
-        <Label htmlFor="featured">Projeto em destaque na página inicial</Label>
+        <Label htmlFor="featured">{t("admin.projects.form.featured")}</Label>
       </div>
 
       <div className="flex gap-4 pt-6 border-t">
         <Button type="submit" disabled={isSubmitting} size="lg">
           {isSubmitting
-            ? "Salvando..."
+            ? t("admin.projects.form.submitting")
             : project
-              ? "Atualizar Projeto"
-              : "Criar Projeto"}
+              ? t("admin.projects.form.update")
+              : t("admin.projects.form.create")}
         </Button>
         <Button
           type="button"
@@ -607,7 +613,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
           size="lg"
           onClick={() => router.push("/admin")}
         >
-          Cancelar
+          {t("admin.projects.form.cancel")}
         </Button>
       </div>
     </form>

@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslations } from "@/i18n/client";
 import {
   getPortfolioSettings,
   updatePortfolioSettings,
@@ -32,6 +33,7 @@ const LANGUAGES = [
 ] as const;
 
 export function SettingsForm() {
+  const t = useTranslations();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [photoUrl, setPhotoUrl] = useState("");
@@ -71,7 +73,7 @@ export function SettingsForm() {
         setRole(settings.role);
       }
     } catch (error) {
-      toast.error("Erro ao carregar configurações");
+      toast.error(t("common.error"));
       console.error(error);
     } finally {
       setLoading(false);
@@ -81,31 +83,28 @@ export function SettingsForm() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // TODO: Implement actual file upload to Firebase Storage or Vercel Blob
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-      toast.info("Upload de imagem será implementado com Firebase Storage");
+      toast.info(t("admin.settings.upload"));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
     if (!name || !email) {
-      toast.error("Preencha todos os campos obrigatórios");
+      toast.error(t("admin.settings.fillAllRequired"));
       return;
     }
 
-    // Validate multilingual fields
     const bioEmpty = Object.values(bio).some((v) => !v.trim());
     const roleEmpty = Object.values(role).some((v) => !v.trim());
 
     if (bioEmpty || roleEmpty) {
-      toast.error("Preencha a bio e cargo em todos os idiomas");
+      toast.error(t("admin.settings.fillBioAndRole"));
       return;
     }
 
@@ -123,9 +122,9 @@ export function SettingsForm() {
       };
 
       await updatePortfolioSettings(data);
-      toast.success("Configurações salvas com sucesso!");
+      toast.success(t("admin.settings.updateSuccess"));
     } catch (error) {
-      toast.error("Erro ao salvar configurações");
+      toast.error(t("common.error"));
       console.error(error);
     } finally {
       setSaving(false);
@@ -142,12 +141,11 @@ export function SettingsForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Photo Upload */}
       <Card>
         <CardHeader>
-          <CardTitle>Foto de Perfil</CardTitle>
+          <CardTitle>{t("admin.settings.photo")}</CardTitle>
           <CardDescription>
-            Sua foto será exibida no hero section
+            {t("admin.settings.photoDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -182,50 +180,48 @@ export function SettingsForm() {
                 className="max-w-xs"
               />
               <p className="text-sm text-muted-foreground mt-2">
-                Recomendado: 400x400px, formato JPG ou PNG
+                {t("admin.settings.photoRecommendation")}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Basic Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Informações Básicas</CardTitle>
+          <CardTitle>{t("admin.settings.basicInfo")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="name">Nome *</Label>
+            <Label htmlFor="name">{t("admin.settings.name")} *</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Seu nome completo"
+              placeholder={t("admin.settings.namePlaceholder")}
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="email">Email de Contato *</Label>
+            <Label htmlFor="email">{t("admin.settings.contactEmail")} *</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com"
+              placeholder={t("admin.settings.emailPlaceholder")}
               required
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Multilingual Fields */}
       <Card>
         <CardHeader>
-          <CardTitle>Cargo / Título</CardTitle>
+          <CardTitle>{t("admin.settings.roleTitle")}</CardTitle>
           <CardDescription>
-            Seu cargo ou título profissional em cada idioma
+            {t("admin.settings.roleDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -245,7 +241,7 @@ export function SettingsForm() {
               >
                 <div>
                   <Label htmlFor={`role-${lang.code}`}>
-                    Cargo ({lang.label}) *
+                    {t("admin.settings.roleTitle")} ({lang.label}) *
                   </Label>
                   <Input
                     id={`role-${lang.code}`}
@@ -253,7 +249,7 @@ export function SettingsForm() {
                     onChange={(e) =>
                       setRole({ ...role, [lang.code]: e.target.value })
                     }
-                    placeholder="Ex: Desenvolvedor Full Stack"
+                    placeholder={t("admin.settings.rolePlaceholder")}
                     required
                   />
                 </div>
@@ -265,9 +261,9 @@ export function SettingsForm() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Bio / Descrição</CardTitle>
+          <CardTitle>{t("admin.settings.bioTitle")}</CardTitle>
           <CardDescription>
-            Uma breve descrição sobre você em cada idioma
+            {t("admin.settings.bioDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -295,7 +291,7 @@ export function SettingsForm() {
                     onChange={(e) =>
                       setBio({ ...bio, [lang.code]: e.target.value })
                     }
-                    placeholder="Conte um pouco sobre você..."
+                    placeholder={t("admin.settings.bioPlaceholder")}
                     rows={4}
                     required
                   />
@@ -306,40 +302,38 @@ export function SettingsForm() {
         </CardContent>
       </Card>
 
-      {/* Social Links */}
       <Card>
         <CardHeader>
-          <CardTitle>Links Sociais</CardTitle>
+          <CardTitle>{t("admin.settings.socialLinks")}</CardTitle>
           <CardDescription>
-            Seus perfis em redes sociais e profissionais
+            {t("admin.settings.socialDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="github">GitHub</Label>
+            <Label htmlFor="github">{t("admin.settings.github")}</Label>
             <Input
               id="github"
               type="url"
               value={github}
               onChange={(e) => setGithub(e.target.value)}
-              placeholder="https://github.com/seu-usuario"
+              placeholder={t("admin.settings.githubPlaceholder")}
             />
           </div>
 
           <div>
-            <Label htmlFor="linkedin">LinkedIn</Label>
+            <Label htmlFor="linkedin">{t("admin.settings.linkedin")}</Label>
             <Input
               id="linkedin"
               type="url"
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-              placeholder="https://linkedin.com/in/seu-usuario"
+              placeholder={t("admin.settings.linkedinPlaceholder")}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Submit Button */}
       <div className="flex justify-end gap-4">
         <Button
           type="button"
@@ -347,16 +341,16 @@ export function SettingsForm() {
           onClick={loadSettings}
           disabled={saving}
         >
-          Cancelar
+          {t("admin.settings.cancel")}
         </Button>
         <Button type="submit" disabled={saving}>
           {saving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Salvando...
+              {t("admin.settings.saving")}
             </>
           ) : (
-            "Salvar Configurações"
+            t("admin.settings.saveSettings")
           )}
         </Button>
       </div>
