@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/i18n/client";
+import analytics from "@/lib/analytics";
 
 interface AIDescriptionGeneratorProps {
   title: string;
@@ -65,6 +66,8 @@ export function AIDescriptionGenerator({
 
       const { description } = await response.json();
       onGenerated(description);
+
+      analytics.admin.aiDescriptionGenerated(type);
 
       toast.success(t("admin.ai.descriptionGenerated"), {
         description: t("admin.ai.descriptionGeneratedDesc"),

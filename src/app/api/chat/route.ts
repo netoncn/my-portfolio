@@ -23,7 +23,6 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
 
-    // Get published projects for context
     const projects = await getPublishedProjects();
 
     const projectsContext = projects.map((p) => ({

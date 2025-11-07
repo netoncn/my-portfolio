@@ -4,24 +4,32 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import analytics from "@/lib/analytics";
 import { signInWithGoogle } from "@/lib/firebase/auth";
+import { useTranslations } from "@/i18n/client";
 
 export function LoginButton() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = useTranslations();
 
   const handleLogin = async () => {
     setLoading(true);
     try {
-      await signInWithGoogle();
-      toast.success("Login realizado com sucesso!", {
-        description: "Redirecionando para o painel administrativo...",
+      const user = await signInWithGoogle();
+      
+      if (user.email) {
+        analytics.admin.login(user.email);
+      }
+      
+      toast.success(t("login.success.title"), {
+        description: t("login.success.description"),
       });
       router.push("/admin");
     } catch (error: any) {
       console.error("[v0] Login error:", error);
-      toast.error("Erro ao fazer login", {
-        description: error.message || "Ocorreu um erro ao tentar fazer login.",
+      toast.error(t("login.error.title"), {
+        description: error.message || t("login.error.description"),
       });
     } finally {
       setLoading(false);
@@ -38,7 +46,7 @@ export function LoginButton() {
       {loading ? (
         <>
           <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-          Entrando...
+          {t("login.signingIn")}
         </>
       ) : (
         <>
@@ -60,7 +68,7 @@ export function LoginButton() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          Entrar com Google
+          {t("login.signInWithGoogle")}
         </>
       )}
     </Button>

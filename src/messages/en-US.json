@@ -27,7 +27,19 @@
     "signOutSuccess": "Successfully signed out!",
     "unauthorized": "Unauthorized access",
     "checkingAuth": "Checking authentication...",
-    "adminOnly": "Only administrators can access this area"
+    "adminOnly": "Only administrators can access this area",
+    "logout": {
+      "button": "Sign Out",
+      "loading": "Signing out...",
+      "success": {
+        "title": "Logout successful!",
+        "description": "See you soon!"
+      },
+      "error": {
+        "title": "Error signing out",
+        "description": "An error occurred while trying to sign out."
+      }
+    }
   },
   "portfolio": {
     "hero": {
@@ -242,6 +254,16 @@
     "description": "Log in to manage your portfolio",
     "welcome": "Welcome",
     "googleAuth": "Log in with your authorized Google account",
-    "backToSite": "Back to portfolio"
+    "backToSite": "Back to portfolio",
+    "signingIn": "Signing in...",
+    "signInWithGoogle": "Sign in with Google",
+    "success": {
+      "title": "Login successful!",
+      "description": "Redirecting to admin panel..."
+    },
+    "error": {
+      "title": "Error logging in",
+      "description": "An error occurred while trying to log in."
+    }
   }
 }

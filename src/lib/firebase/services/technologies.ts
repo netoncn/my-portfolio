@@ -7,7 +7,7 @@ import {
   getDocs,
   increment,
   orderBy,
-  type QueryDocumentSnapshot, // Added setDoc import
+  type QueryDocumentSnapshot,
   query,
   serverTimestamp,
   setDoc,

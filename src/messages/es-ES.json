@@ -27,7 +27,19 @@
     "signOutSuccess": "¡Sesión cerrada con éxito!",
     "unauthorized": "Acceso no autorizado",
     "checkingAuth": "Verificando autenticación...",
-    "adminOnly": "Solo los administradores pueden acceder a esta área"
+    "adminOnly": "Solo los administradores pueden acceder a esta área",
+    "logout": {
+      "button": "Cerrar Sesión",
+      "loading": "Cerrando sesión...",
+      "success": {
+        "title": "¡Cierre de sesión exitoso!",
+        "description": "¡Hasta pronto!"
+      },
+      "error": {
+        "title": "Error al cerrar sesión",
+        "description": "Ocurrió un error al intentar cerrar sesión."
+      }
+    }
   },
   "portfolio": {
     "hero": {
@@ -242,6 +254,16 @@
     "description": "Inicie sesión para administrar su portafolio",
     "welcome": "Bienvenido",
     "googleAuth": "Inicie sesión con su cuenta de Google autorizada",
-    "backToSite": "Volver al portafolio"
+    "backToSite": "Volver al portafolio",
+    "signingIn": "Iniciando sesión...",
+    "signInWithGoogle": "Iniciar sesión con Google",
+    "success": {
+      "title": "¡Inicio de sesión exitoso!",
+      "description": "Redirigiendo al panel administrativo..."
+    },
+    "error": {
+      "title": "Error al iniciar sesión",
+      "description": "Ocurrió un error al intentar iniciar sesión."
+    }
   }
 }

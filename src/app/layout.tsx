@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Geist, Geist_Mono } from "next/font/google";
 import type React from "react";
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { I18nProvider } from "@/i18n/client";
+import { PostHogProvider, PostHogPageView } from "@/providers/posthog-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
@@ -69,6 +71,12 @@ export default async function RootLayout({
           rel="dns-prefetch"
           href="https://identitytoolkit.googleapis.com"
         />
+        {process.env.NEXT_PUBLIC_POSTHOG_HOST && (
+          <link
+            rel="dns-prefetch"
+            href={process.env.NEXT_PUBLIC_POSTHOG_HOST}
+          />
+        )}
         <style
           dangerouslySetInnerHTML={{
             __html: `
@@ -87,22 +95,27 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-          enableColorScheme
-        >
-          <I18nProvider>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </I18nProvider>
-        </ThemeProvider>
-        <SpeedInsights />
-        <Analytics />
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+            enableColorScheme
+          >
+            <I18nProvider>
+              <AuthProvider>
+                {children}
+                <Toaster />
+              </AuthProvider>
+            </I18nProvider>
+          </ThemeProvider>
+          <SpeedInsights />
+          <Analytics />
+        </PostHogProvider>
       </body>
     </html>
   );

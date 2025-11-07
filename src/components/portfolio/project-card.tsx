@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/client";
 import { scaleIn } from "@/lib/animations";
+import analytics from "@/lib/analytics";
 import type { Project } from "@/lib/firebase/types";
 
 interface ProjectCardProps {
@@ -27,6 +28,24 @@ export const ProjectCard = memo(function ProjectCard({
   const title = project.title[locale] || "Project Title";
   const shortDesc = project.shortDescription[locale] || "Project Description";
 
+  const handleProjectClick = () => {
+    analytics.project.viewed(project.id, title);
+  };
+
+  const handleGithubClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (project.githubUrl) {
+      analytics.project.codeClicked(project.id, title, project.githubUrl);
+    }
+  };
+
+  const handleLiveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (project.liveUrl) {
+      analytics.project.liveClicked(project.id, title, project.liveUrl);
+    }
+  };
+
   return (
     <motion.article
       className="group relative overflow-hidden rounded-lg border bg-card transition-all hover:border-primary/50 hover:shadow-lg"
@@ -37,7 +56,11 @@ export const ProjectCard = memo(function ProjectCard({
       transition={{ duration: 0.3, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
     >
-      <Link href={`/projects/${project.slug}`} className="block">
+      <Link 
+        href={`/projects/${project.slug}`} 
+        className="block"
+        onClick={handleProjectClick}
+      >
         <div className="aspect-video relative overflow-hidden bg-muted">
           {project.thumbnailUrl ? (
             <Image
@@ -94,7 +117,7 @@ export const ProjectCard = memo(function ProjectCard({
                 variant="ghost"
                 size="sm"
                 asChild
-                onClick={(e) => e.stopPropagation()}
+                onClick={handleGithubClick}
                 className="hover:scale-110 transition-transform"
               >
                 <a
@@ -112,7 +135,7 @@ export const ProjectCard = memo(function ProjectCard({
                 variant="ghost"
                 size="sm"
                 asChild
-                onClick={(e) => e.stopPropagation()}
+                onClick={handleLiveClick}
                 className="hover:scale-110 transition-transform"
               >
                 <a

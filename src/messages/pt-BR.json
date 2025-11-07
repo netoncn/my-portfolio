@@ -27,7 +27,19 @@
     "signOutSuccess": "Logout realizado com sucesso!",
     "unauthorized": "Acesso não autorizado",
     "checkingAuth": "Verificando autenticação...",
-    "adminOnly": "Apenas administradores podem acessar esta área"
+    "adminOnly": "Apenas administradores podem acessar esta área",
+    "logout": {
+      "button": "Sair",
+      "loading": "Saindo...",
+      "success": {
+        "title": "Logout realizado com sucesso!",
+        "description": "Até logo!"
+      },
+      "error": {
+        "title": "Erro ao fazer logout",
+        "description": "Ocorreu um erro ao tentar sair."
+      }
+    }
   },
   "portfolio": {
     "hero": {
@@ -242,6 +254,16 @@
     "description": "Faça login para gerenciar seu portfólio",
     "welcome": "Bem-vindo",
     "googleAuth": "Faça login com sua conta Google autorizada",
-    "backToSite": "Voltar para o portfólio"
+    "backToSite": "Voltar para o portfólio",
+    "signingIn": "Entrando...",
+    "signInWithGoogle": "Entrar com Google",
+    "success": {
+      "title": "Login realizado com sucesso!",
+      "description": "Redirecionando para o painel administrativo..."
+    },
+    "error": {
+      "title": "Erro ao fazer login",
+      "description": "Ocorreu um erro ao tentar fazer login."
+    }
   }
 }

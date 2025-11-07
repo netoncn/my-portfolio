@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useI18n } from "@/i18n/client";
+import analytics from "@/lib/analytics";
 
 const languages = {
   "pt-BR": "Português (BR)",
@@ -18,6 +19,11 @@ const languages = {
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useI18n();
+
+  const handleLanguageChange = (newLocale: "pt-BR" | "en-US" | "es-ES") => {
+    analytics.language.changed(locale, newLocale);
+    setLocale(newLocale);
+  };
 
   return (
     <DropdownMenu>
@@ -31,7 +37,7 @@ export function LanguageSwitcher() {
         {Object.entries(languages).map(([code, name]) => (
           <DropdownMenuItem
             key={code}
-            onClick={() => setLocale(code as "pt-BR" | "en-US" | "es-ES")}
+            onClick={() => handleLanguageChange(code as "pt-BR" | "en-US" | "es-ES")}
             className={locale === code ? "bg-accent" : ""}
           >
             {name}

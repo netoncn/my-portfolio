@@ -9,6 +9,7 @@ import { getAllTechnologies } from "@/lib/firebase/services/technologies";
 import type { Project } from "@/lib/firebase/types";
 import { FeaturedProjectCard } from "./featured-project-card";
 import { ProjectCard } from "./project-card";
+import analytics from "@/lib/analytics";
 
 interface ProjectsGridProps {
   projects: Project[];
@@ -25,6 +26,13 @@ const TechFilter = memo(function TechFilter({
 }) {
   const t = useTranslations();
 
+  const handleFilterClick = (techId: string, techName: string) => {
+    if (techId !== "all") {
+      analytics.project.filtered(techName);
+    }
+    onSelect(techId);
+  };
+
   return (
     <motion.div
       className="flex flex-wrap gap-2"
@@ -37,7 +45,7 @@ const TechFilter = memo(function TechFilter({
       <motion.div variants={fadeInUp}>
         <Button
           variant={selected === "all" ? "default" : "outline"}
-          onClick={() => onSelect("all")}
+          onClick={() => handleFilterClick("all", "all")}
           size="sm"
           className="transition-all hover:scale-105"
         >
@@ -53,7 +61,7 @@ const TechFilter = memo(function TechFilter({
         >
           <Button
             variant={selected === tech.id ? "default" : "outline"}
-            onClick={() => onSelect(tech.id)}
+            onClick={() => handleFilterClick(tech.id, tech.name)}
             size="sm"
             className="transition-all hover:scale-105"
           >

@@ -36,6 +36,7 @@ import type {
   ProjectCategory,
   ProjectStatus,
 } from "@/lib/firebase/types";
+import analytics from "@/lib/analytics";
 
 interface ProjectFormProps {
   project?: Project;
@@ -224,9 +225,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       if (project) {
         await updateProject(project.id, formData);
+        
+        analytics.admin.projectUpdated(project.id, title["pt-BR"]);
+        
         toast.success(t("admin.projects.updateSuccess"));
       } else {
-        await createProject(formData);
+        const projectId = await createProject(formData);
+        
+        analytics.admin.projectCreated(projectId, title["pt-BR"]);
+        
         toast.success(t("admin.projects.createSuccess"));
       }
 
@@ -248,9 +255,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
         <Label>{t("admin.projects.form.title")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="pt-BR">Português</TabsTrigger>
-            <TabsTrigger value="en-US">English</TabsTrigger>
-            <TabsTrigger value="es-ES">Español</TabsTrigger>
+            <TabsTrigger value="pt-BR">{t("languages.pt-BR")}</TabsTrigger>
+            <TabsTrigger value="en-US">{t("languages.en-US")}</TabsTrigger>
+            <TabsTrigger value="es-ES">{t("languages.es-ES")}</TabsTrigger>
           </TabsList>
           <TabsContent value="pt-BR" className="mt-3">
             <Input
@@ -297,9 +304,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
         <Label>{t("admin.projects.form.shortDescription")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="pt-BR">Português</TabsTrigger>
-            <TabsTrigger value="en-US">English</TabsTrigger>
-            <TabsTrigger value="es-ES">Español</TabsTrigger>
+            <TabsTrigger value="pt-BR">{t("languages.pt-BR")}</TabsTrigger>
+            <TabsTrigger value="en-US">{t("languages.en-US")}</TabsTrigger>
+            <TabsTrigger value="es-ES">{t("languages.es-ES")}</TabsTrigger>
           </TabsList>
           <TabsContent value="pt-BR" className="mt-3">
             <Textarea
@@ -350,9 +357,9 @@ export function ProjectForm({ project }: ProjectFormProps) {
         <Label>{t("admin.projects.form.longDescription")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="pt-BR">Português</TabsTrigger>
-            <TabsTrigger value="en-US">English</TabsTrigger>
-            <TabsTrigger value="es-ES">Español</TabsTrigger>
+            <TabsTrigger value="pt-BR">{t("languages.pt-BR")}</TabsTrigger>
+            <TabsTrigger value="en-US">{t("languages.en-US")}</TabsTrigger>
+            <TabsTrigger value="es-ES">{t("languages.es-ES")}</TabsTrigger>
           </TabsList>
           <TabsContent value="pt-BR" className="mt-3">
             <Textarea

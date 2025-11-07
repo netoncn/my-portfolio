@@ -28,6 +28,7 @@ import {
 import { useI18n, useTranslations } from "@/i18n/client";
 import { deleteProject } from "@/lib/firebase/services/admin-projects";
 import type { Project } from "@/lib/firebase/types";
+import analytics from "@/lib/analytics";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -64,6 +65,12 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
     setIsDeleting(true);
     try {
       await deleteProject(projectToDelete.id);
+
+      analytics.admin.projectDeleted(
+        projectToDelete.id, 
+        projectToDelete.title[locale]
+      );
+
       toast.success(t("admin.projects.deleteSuccess"));
       setDeleteDialogOpen(false);
       router.refresh();

@@ -25,6 +25,7 @@ import type {
   MultilingualText,
   PortfolioSettingsInput,
 } from "@/lib/firebase/types";
+import analytics from "@/lib/analytics";
 
 const LANGUAGES = [
   { code: "pt-BR", label: "Português" },
@@ -122,6 +123,8 @@ export function SettingsForm() {
       };
 
       await updatePortfolioSettings(data);
+      analytics.admin.settingsUpdated();
+
       toast.success(t("admin.settings.updateSuccess"));
     } catch (error) {
       toast.error(t("common.error"));
