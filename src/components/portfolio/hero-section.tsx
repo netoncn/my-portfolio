@@ -36,7 +36,7 @@ export const HeroSection = memo(function HeroSection({
         <motion.div
           className="space-y-4 mb-12"
           variants={slideInFromLeft}
-          transition={smooth as any}
+          transition={smooth}
         >
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-balance">
             {settings?.name || "Portfolio"}
@@ -50,9 +50,9 @@ export const HeroSection = memo(function HeroSection({
           <motion.div
             className="flex-1 space-y-6 order-2 md:order-1"
             variants={fadeInUp}
-            transition={{ ...(smooth as any), delay: 0.1 }}
+            transition={{ ...smooth, delay: 0.1 }}
           >
-            <p className="text-l md:text-l text-muted-foreground leading-relaxed">
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
               {settings?.bio
                 ? t.getMultilingualText(settings.bio)
                 : t("portfolio.hero.description")}
@@ -64,7 +64,7 @@ export const HeroSection = memo(function HeroSection({
               <motion.div
                 className="relative aspect-square w-full max-w-[300px]"
                 variants={slideInFromRight}
-                transition={smooth as any}
+                transition={smooth}
                 whileHover={{ scale: 1.05 }}
               >
                 <Image
@@ -85,7 +85,7 @@ export const HeroSection = memo(function HeroSection({
               <motion.div
                 className="flex gap-4"
                 variants={fadeInUp}
-                transition={{ ...(smooth as any), delay: 0.3 }}
+                transition={{ ...smooth, delay: 0.3 }}
               >
                 {settings.github && (
                   <Button
@@ -139,7 +139,7 @@ export const HeroSection = memo(function HeroSection({
             <motion.div
               className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
               variants={fadeInUp}
-              transition={{ ...(smooth as any), delay: 0.2 }}
+              transition={{ ...smooth, delay: 0.2 }}
             >
               <Button asChild size="lg" className="group w-full sm:w-auto">
                 <Link href="#projects">

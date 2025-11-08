@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/i18n/client";
 import analytics from "@/lib/analytics";
 import { signOut } from "@/lib/firebase/auth";
-import { useTranslations } from "@/i18n/client";
 
 interface LogoutButtonProps {
   variant?: "default" | "ghost" | "outline";
@@ -27,7 +27,7 @@ export function LogoutButton({
     try {
       analytics.admin.logout();
       await signOut();
-      
+
       toast.success(t("auth.logout.success.title"), {
         description: t("auth.logout.success.description"),
       });

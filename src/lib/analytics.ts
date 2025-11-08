@@ -1,4 +1,4 @@
-import posthog from "posthog-js";
+import posthog, { type Properties } from "posthog-js";
 
 const isEnabled = () => {
   return typeof window !== "undefined" && !!process.env.NEXT_PUBLIC_POSTHOG_KEY;
@@ -6,7 +6,7 @@ const isEnabled = () => {
 
 export const analytics = {
   page: {
-    view: (pageName: string, properties?: Record<string, any>) => {
+    view: (pageName: string, properties?: Properties) => {
       if (!isEnabled()) return;
       posthog.capture("page_viewed", {
         page_name: pageName,
@@ -141,11 +141,11 @@ export const analytics = {
   },
 
   user: {
-    identify: (userId: string, properties?: Record<string, any>) => {
+    identify: (userId: string, properties?: Properties) => {
       if (!isEnabled()) return;
       posthog.identify(userId, properties);
     },
-    setProperties: (properties: Record<string, any>) => {
+    setProperties: (properties: Properties) => {
       if (!isEnabled()) return;
       posthog.people.set(properties);
     },

@@ -1,6 +1,5 @@
 import AdminDashboardClient from "@/components/admin/admin-dashboard";
 import { AdminHeader } from "@/components/admin/admin-header";
-import { ProjectsTable } from "@/components/admin/projects-table";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { getAllProjects } from "@/lib/firebase/services/admin-projects";
 

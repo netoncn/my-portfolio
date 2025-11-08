@@ -37,7 +37,9 @@ export function LanguageSwitcher() {
         {Object.entries(languages).map(([code, name]) => (
           <DropdownMenuItem
             key={code}
-            onClick={() => handleLanguageChange(code as "pt-BR" | "en-US" | "es-ES")}
+            onClick={() =>
+              handleLanguageChange(code as "pt-BR" | "en-US" | "es-ES")
+            }
             className={locale === code ? "bg-accent" : ""}
           >
             {name}

@@ -53,9 +53,9 @@ export function ContactSection({
             </Button>
           )}
           {settings?.github && (
-            <Button 
-              asChild 
-              variant="outline" 
+            <Button
+              asChild
+              variant="outline"
               size="lg"
               onClick={handleGithubClick}
             >
@@ -70,9 +70,9 @@ export function ContactSection({
             </Button>
           )}
           {settings?.linkedin && (
-            <Button 
-              asChild 
-              variant="outline" 
+            <Button
+              asChild
+              variant="outline"
               size="lg"
               onClick={handleLinkedinClick}
             >

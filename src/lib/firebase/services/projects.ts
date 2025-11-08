@@ -17,10 +17,15 @@ import { COLLECTIONS } from "../collections";
 import { db } from "../config";
 import type { Project, ProjectCategory } from "../types";
 
+type ProjectFirestoreData = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
+  createdAt?: Timestamp | string | null;
+  updatedAt?: Timestamp | string | null;
+};
+
 function serializeProject(
   document: QueryDocumentSnapshot<DocumentData>,
 ): Project {
-  const data = document.data() as any;
+  const data = document.data() as ProjectFirestoreData;
 
   const createdAt =
     data.createdAt instanceof Timestamp
@@ -32,11 +37,13 @@ function serializeProject(
       ? data.updatedAt.toDate().toISOString()
       : (data.updatedAt ?? null);
 
+  const { createdAt: _c, updatedAt: _u, ...rest } = data;
+
   return {
     id: document.id,
-    ...data,
-    createdAt,
-    updatedAt,
+    ...rest,
+    createdAt: createdAt as unknown as Timestamp,
+    updatedAt: updatedAt as unknown as Timestamp,
   } as Project;
 }
 
@@ -124,7 +131,7 @@ export const getProjectById = cache(
         return null;
       }
 
-      const data = docSnap.data() as any;
+      const data = docSnap.data() as ProjectFirestoreData;
 
       const createdAt =
         data.createdAt instanceof Timestamp
@@ -136,11 +143,13 @@ export const getProjectById = cache(
           ? data.updatedAt.toDate().toISOString()
           : (data.updatedAt ?? null);
 
+      const { createdAt: _c, updatedAt: _u, ...rest } = data;
+
       return {
         id: docSnap.id,
-        ...data,
-        createdAt,
-        updatedAt,
+        ...rest,
+        createdAt: createdAt as unknown as Timestamp,
+        updatedAt: updatedAt as unknown as Timestamp,
       } as Project;
     } catch (error) {
       console.error("[v0] Error getting project by ID:", error);
@@ -159,7 +168,7 @@ export const getAllProjectSlugs = cache(async (): Promise<string[]> => {
     const querySnapshot = await getDocs(q);
 
     return querySnapshot.docs.map((document) => {
-      const data = document.data() as any;
+      const data = document.data() as ProjectFirestoreData;
       return data.slug as string;
     });
   } catch (error) {

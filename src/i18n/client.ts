@@ -3,6 +3,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import type { Locale } from "@/lib/firebase/types";
 
+interface Messages {
+  [key: string]: string | Messages;
+}
+
 interface I18nContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
@@ -46,15 +50,35 @@ function getInitialLocale(): Locale {
   return detectBrowserLocale();
 }
 
-function saveLocale(locale: Locale) {
-  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=${30 * 24 * 60 * 60}`;
+function setCookie(name: string, value: string, days = 365) {
+  if (typeof document === "undefined") return;
 
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = date.toUTCString();
+
+  const isSecure =
+    typeof window !== "undefined" && window.location.protocol === "https:";
+
+  const secureAttr = isSecure ? "; Secure" : "";
+  const sameSiteAttr = "; SameSite=Lax";
+
+  // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API not supported in this browser, using document.cookie as fallback.
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(
+    value,
+  )}; expires=${expires}; path=/${secureAttr}${sameSiteAttr}`;
+}
+
+function saveLocale(locale: Locale) {
+  setCookie(LOCALE_COOKIE_NAME, locale);
   localStorage.setItem(LOCALE_COOKIE_NAME, locale);
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
-  const [currentMessages, setCurrentMessages] = useState();
+  const [currentMessages, setCurrentMessages] = useState<Messages>(
+    {} as Messages,
+  );
 
   useEffect(() => {
     import(`@/messages/${locale}.json`).then((module) => {
@@ -69,7 +93,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const t = (key: string): string => {
     const keys = key.split(".");
-    let value: any = currentMessages;
+    let value: string | Messages | undefined = currentMessages;
 
     for (const k of keys) {
       if (value && typeof value === "object" && k in value) {

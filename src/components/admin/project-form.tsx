@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "@/i18n/client";
+import analytics from "@/lib/analytics";
 import {
   createProject,
   generateSlug,
@@ -36,7 +37,6 @@ import type {
   ProjectCategory,
   ProjectStatus,
 } from "@/lib/firebase/types";
-import analytics from "@/lib/analytics";
 
 interface ProjectFormProps {
   project?: Project;
@@ -225,15 +225,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       if (project) {
         await updateProject(project.id, formData);
-        
+
         analytics.admin.projectUpdated(project.id, title["pt-BR"]);
-        
+
         toast.success(t("admin.projects.updateSuccess"));
       } else {
         const projectId = await createProject(formData);
-        
+
         analytics.admin.projectCreated(projectId, title["pt-BR"]);
-        
+
         toast.success(t("admin.projects.createSuccess"));
       }
 
@@ -241,8 +241,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
       router.refresh();
     } catch (error) {
       toast.error(t("admin.projects.errorSaving"), {
-        description:
-          error instanceof Error ? error.message : t("common.error"),
+        description: error instanceof Error ? error.message : t("common.error"),
       });
     } finally {
       setIsSubmitting(false);
@@ -451,7 +450,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
             id="order"
             type="number"
             value={order}
-            onChange={(e) => setOrder(Number.parseInt(e.target.value) || 0)}
+            onChange={(e) => setOrder(Number.parseInt(e.target.value, 10) || 0)}
             placeholder={t("admin.projects.form.orderPlaceholder")}
           />
         </div>

@@ -21,6 +21,11 @@ import {
   incrementTechnologyUsage,
 } from "./technologies";
 
+type ProjectFirestoreData = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
+  createdAt?: Timestamp | string | null;
+  updatedAt?: Timestamp | string | null;
+};
+
 export async function getAllProjects(
   status?: ProjectStatus,
 ): Promise<Project[]> {
@@ -38,7 +43,7 @@ export async function getAllProjects(
     const querySnapshot = await getDocs(q);
 
     return querySnapshot.docs.map((snap) => {
-      const data = snap.data() as any;
+      const data = snap.data() as ProjectFirestoreData;
 
       const createdAt =
         data.createdAt instanceof Timestamp
@@ -50,11 +55,13 @@ export async function getAllProjects(
           ? data.updatedAt.toDate().toISOString()
           : null;
 
+      const { createdAt: _c, updatedAt: _u, ...rest } = data;
+
       return {
         id: snap.id,
-        ...data,
-        createdAt,
-        updatedAt,
+        ...rest,
+        createdAt: createdAt as unknown as Timestamp,
+        updatedAt: updatedAt as unknown as Timestamp,
       } as Project;
     });
   } catch (error) {
@@ -132,7 +139,7 @@ export async function deleteProject(id: string): Promise<void> {
     const docRef = doc(db, COLLECTIONS.PROJECTS, id);
     await deleteDoc(docRef);
 
-    if (project && project.technologies && project.technologies.length > 0) {
+    if (project?.technologies && project.technologies.length > 0) {
       await Promise.all(
         project.technologies.map((tech) => decrementTechnologyUsage(tech)),
       );
@@ -152,7 +159,7 @@ export async function getProjectByIdAdmin(id: string): Promise<Project | null> {
       return null;
     }
 
-    const data = docSnap.data() as any;
+    const data = docSnap.data() as ProjectFirestoreData;
 
     const createdAt =
       data.createdAt instanceof Timestamp
@@ -164,11 +171,13 @@ export async function getProjectByIdAdmin(id: string): Promise<Project | null> {
         ? data.updatedAt.toDate().toISOString()
         : null;
 
+    const { createdAt: _c, updatedAt: _u, ...rest } = data;
+
     return {
       id: docSnap.id,
-      ...data,
-      createdAt,
-      updatedAt,
+      ...rest,
+      createdAt: createdAt as unknown as Timestamp,
+      updatedAt: updatedAt as unknown as Timestamp,
     } as Project;
   } catch (error) {
     console.error("[v0] Error getting project by ID:", error);

@@ -14,7 +14,7 @@ const HeaderContent = memo(function HeaderContent({ name }: { name?: string }) {
       className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={smooth as any}
+      transition={smooth}
     >
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         <Link href="/" className="font-bold flex items-center gap-4">

@@ -45,7 +45,7 @@ Tecnologias principais: ${[...new Set(projects.flatMap((p) => p.technologies))].
 
     const result = streamText({
       model: openai("gpt-4.1"),
-      system: SYSTEM_PROMPT + "\n\n" + contextMessage,
+      system: `${SYSTEM_PROMPT}\n\n${contextMessage}`,
       messages,
       temperature: 0.7,
     });

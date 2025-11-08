@@ -29,7 +29,7 @@ export async function signInWithGoogle() {
     }
 
     return user;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[v0] Error signing in with Google:", error);
     throw error;
   }

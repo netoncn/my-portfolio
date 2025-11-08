@@ -6,21 +6,19 @@ import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { I18nProvider } from "@/i18n/client";
-import { PostHogProvider, PostHogPageView } from "@/providers/posthog-provider";
+import { PostHogPageView, PostHogProvider } from "@/providers/posthog-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "@/styles/globals.css";
 
-const SpeedInsights = dynamic(
-  () =>
-    import("@vercel/speed-insights/next").then((mod) => ({
-      default: mod.SpeedInsights,
-    }))
+const SpeedInsights = dynamic(() =>
+  import("@vercel/speed-insights/next").then((mod) => ({
+    default: mod.SpeedInsights,
+  })),
 );
-const Analytics = dynamic(
-  () =>
-    import("@vercel/analytics/next").then((mod) => ({
-      default: mod.Analytics,
-    }))
+const Analytics = dynamic(() =>
+  import("@vercel/analytics/next").then((mod) => ({
+    default: mod.Analytics,
+  })),
 );
 
 const geistSans = Geist({

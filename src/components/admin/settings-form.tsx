@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -17,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "@/i18n/client";
+import analytics from "@/lib/analytics";
 import {
   getPortfolioSettings,
   updatePortfolioSettings,
@@ -25,7 +27,6 @@ import type {
   MultilingualText,
   PortfolioSettingsInput,
 } from "@/lib/firebase/types";
-import analytics from "@/lib/analytics";
 
 const LANGUAGES = [
   { code: "pt-BR", label: "Português" },
@@ -155,7 +156,7 @@ export function SettingsForm() {
           <div className="flex items-center gap-6">
             {photoUrl ? (
               <div className="relative">
-                <img
+                <Image
                   src={photoUrl || "/placeholder.svg"}
                   alt="Profile"
                   className="h-24 w-24 rounded-full object-cover"

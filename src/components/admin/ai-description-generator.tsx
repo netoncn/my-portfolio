@@ -74,8 +74,7 @@ export function AIDescriptionGenerator({
       });
     } catch (error) {
       toast.error(t("admin.ai.error"), {
-        description:
-          error instanceof Error ? error.message : t("common.error"),
+        description: error instanceof Error ? error.message : t("common.error"),
       });
     } finally {
       setIsGenerating(false);

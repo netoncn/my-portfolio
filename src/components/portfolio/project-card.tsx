@@ -8,8 +8,8 @@ import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/i18n/client";
-import { scaleIn } from "@/lib/animations";
 import analytics from "@/lib/analytics";
+import { scaleIn } from "@/lib/animations";
 import type { Project } from "@/lib/firebase/types";
 
 interface ProjectCardProps {
@@ -56,8 +56,8 @@ export const ProjectCard = memo(function ProjectCard({
       transition={{ duration: 0.3, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
     >
-      <Link 
-        href={`/projects/${project.slug}`} 
+      <Link
+        href={`/projects/${project.slug}`}
         className="block"
         onClick={handleProjectClick}
       >

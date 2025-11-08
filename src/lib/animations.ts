@@ -1,3 +1,5 @@
+import type { Transition } from "framer-motion";
+
 export const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -47,7 +49,7 @@ export const spring = {
   damping: 20,
 };
 
-export const smooth = {
+export const smooth: Transition = {
   duration: 0.3,
   ease: [0.4, 0, 0.2, 1],
 };

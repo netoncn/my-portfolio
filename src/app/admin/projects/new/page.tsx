@@ -7,7 +7,7 @@ import { useTranslations } from "@/i18n/client";
 
 export default function NewProjectPage() {
   const t = useTranslations();
-  
+
   return (
     <AuthGuard>
       <div className="min-h-screen bg-background">

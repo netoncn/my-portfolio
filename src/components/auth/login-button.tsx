@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/i18n/client";
 import analytics from "@/lib/analytics";
 import { signInWithGoogle } from "@/lib/firebase/auth";
-import { useTranslations } from "@/i18n/client";
 
 export function LoginButton() {
   const [loading, setLoading] = useState(false);
@@ -17,19 +17,19 @@ export function LoginButton() {
     setLoading(true);
     try {
       const user = await signInWithGoogle();
-      
+
       if (user.email) {
         analytics.admin.login(user.email);
       }
-      
+
       toast.success(t("login.success.title"), {
         description: t("login.success.description"),
       });
       router.push("/admin");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[v0] Login error:", error);
       toast.error(t("login.error.title"), {
-        description: error.message || t("login.error.description"),
+        description: (error as Error).message || t("login.error.description"),
       });
     } finally {
       setLoading(false);

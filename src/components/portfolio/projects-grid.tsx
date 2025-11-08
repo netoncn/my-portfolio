@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { memo, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/i18n/client";
+import analytics from "@/lib/analytics";
 import { fadeInUp, smooth, staggerContainer } from "@/lib/animations";
 import { getAllTechnologies } from "@/lib/firebase/services/technologies";
 import type { Project } from "@/lib/firebase/types";
 import { FeaturedProjectCard } from "./featured-project-card";
 import { ProjectCard } from "./project-card";
-import analytics from "@/lib/analytics";
 
 interface ProjectsGridProps {
   projects: Project[];
@@ -40,7 +40,7 @@ const TechFilter = memo(function TechFilter({
       whileInView="animate"
       viewport={{ once: true }}
       variants={staggerContainer}
-      transition={smooth as any}
+      transition={smooth}
     >
       <motion.div variants={fadeInUp}>
         <Button
@@ -132,7 +132,7 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
           whileInView="animate"
           viewport={{ once: true }}
           variants={fadeInUp}
-          transition={smooth as any}
+          transition={smooth}
         >
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
             {t("portfolio.projects.title")}
@@ -153,7 +153,7 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
             className="text-center py-20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={smooth as any}
+            transition={smooth}
           >
             <p className="text-muted-foreground">
               {t("portfolio.projects.noProjects")}

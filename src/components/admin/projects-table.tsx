@@ -26,9 +26,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useI18n, useTranslations } from "@/i18n/client";
+import analytics from "@/lib/analytics";
 import { deleteProject } from "@/lib/firebase/services/admin-projects";
 import type { Project } from "@/lib/firebase/types";
-import analytics from "@/lib/analytics";
 
 interface ProjectsTableProps {
   projects: Project[];
@@ -67,8 +67,8 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       await deleteProject(projectToDelete.id);
 
       analytics.admin.projectDeleted(
-        projectToDelete.id, 
-        projectToDelete.title[locale]
+        projectToDelete.id,
+        projectToDelete.title[locale],
       );
 
       toast.success(t("admin.projects.deleteSuccess"));
@@ -76,8 +76,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       router.refresh();
     } catch (error) {
       toast.error(t("common.error"), {
-        description:
-          error instanceof Error ? error.message : t("common.error"),
+        description: error instanceof Error ? error.message : t("common.error"),
       });
     } finally {
       setIsDeleting(false);
@@ -88,7 +87,9 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
   if (projects.length === 0) {
     return (
       <div className="text-center py-12 border rounded-lg">
-        <p className="text-muted-foreground">{t("admin.projects.noProjects")}</p>
+        <p className="text-muted-foreground">
+          {t("admin.projects.noProjects")}
+        </p>
         <Button asChild className="mt-4">
           <Link href="/admin/projects/new">
             {t("admin.projects.createFirst")}

@@ -23,8 +23,7 @@ export function AdminHeader() {
       router.push("/admin/login");
     } catch (error) {
       toast.error(t("common.error"), {
-        description:
-          error instanceof Error ? error.message : t("common.error"),
+        description: error instanceof Error ? error.message : t("common.error"),
       });
     }
   };

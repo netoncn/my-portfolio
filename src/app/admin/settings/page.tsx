@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { AdminHeader } from "@/components/admin/admin-header";
 import { SettingsForm } from "@/components/admin/settings-form";
