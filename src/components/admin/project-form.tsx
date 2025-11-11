@@ -23,11 +23,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "@/i18n/client";
 import analytics from "@/lib/analytics";
 import {
-  createProject,
-  generateSlug,
-  updateProject,
-} from "@/lib/firebase/services/admin-projects";
-import {
   createTechnology,
   getAllTechnologies,
 } from "@/lib/firebase/services/technologies";
@@ -37,6 +32,7 @@ import type {
   ProjectCategory,
   ProjectStatus,
 } from "@/lib/firebase/types";
+import { generateSlug } from "@/lib/utils";
 
 interface ProjectFormProps {
   project?: Project;
@@ -224,16 +220,32 @@ export function ProjectForm({ project }: ProjectFormProps) {
       };
 
       if (project) {
-        await updateProject(project.id, formData);
+        const response = await fetch(`/api/admin/projects/${project.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Falha ao atualizar projeto");
+        }
 
         analytics.admin.projectUpdated(project.id, title["pt-BR"]);
-
         toast.success(t("admin.projects.updateSuccess"));
       } else {
-        const projectId = await createProject(formData);
+        const response = await fetch("/api/admin/projects", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Falha ao criar projeto");
+        }
+
+        const { id: projectId } = await response.json();
 
         analytics.admin.projectCreated(projectId, title["pt-BR"]);
-
         toast.success(t("admin.projects.createSuccess"));
       }
 

@@ -151,14 +151,3 @@ export async function decrementTechnologyUsage(id: string): Promise<void> {
     console.error("[technologies] Error decrementing technology usage:", error);
   }
 }
-
-export function generateTechnologySlug(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}

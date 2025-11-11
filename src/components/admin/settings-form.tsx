@@ -27,6 +27,7 @@ import type {
   MultilingualText,
   PortfolioSettingsInput,
 } from "@/lib/firebase/types";
+import { uploadImage, deleteImage } from "@/lib/firebase/storage";
 
 const LANGUAGES = [
   { code: "pt-BR", label: "Português" },
@@ -43,6 +44,8 @@ export function SettingsForm() {
   const [email, setEmail] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [oldPhotoUrl, setOldPhotoUrl] = useState("");
 
   const [bio, setBio] = useState<MultilingualText>({
     "en-US": "",
@@ -67,6 +70,7 @@ export function SettingsForm() {
 
       if (settings) {
         setPhotoUrl(settings.photo || "");
+        setOldPhotoUrl(settings.photo || "");
         setName(settings.name || "");
         setEmail(settings.email || "");
         setGithub(settings.github || "");
@@ -82,15 +86,56 @@ export function SettingsForm() {
     }
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      toast.info(t("admin.settings.upload"));
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Por favor, selecione uma imagem válida");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 5MB");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const timestamp = Date.now();
+      const extension = file.name.split(".").pop();
+      const fileName = `profile-${timestamp}.${extension}`;
+
+      const url = await uploadImage(file, `profile/${fileName}`);
+
+      if (oldPhotoUrl && oldPhotoUrl !== url) {
+        await deleteImage(oldPhotoUrl).catch(console.error);
+      }
+
+      setPhotoUrl(url);
+      setOldPhotoUrl(url);
+
+      toast.success("Foto enviada com sucesso!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Erro ao fazer upload da foto");
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  const handlePhotoRemove = async () => {
+    try {
+      if (oldPhotoUrl) {
+        await deleteImage(oldPhotoUrl).catch(console.error);
+      }
+      setPhotoUrl("");
+      setOldPhotoUrl("");
+      toast.success("Foto removida com sucesso!");
+    } catch (error) {
+      console.error("Remove error:", error);
+      toast.error("Erro ao remover foto");
     }
   };
 
@@ -157,8 +202,10 @@ export function SettingsForm() {
             {photoUrl ? (
               <div className="relative">
                 <Image
-                  src={photoUrl || "/placeholder.svg"}
+                  src={photoUrl}
                   alt="Profile"
+                  width={96}
+                  height={96}
                   className="h-24 w-24 rounded-full object-cover"
                 />
                 <Button
@@ -166,7 +213,8 @@ export function SettingsForm() {
                   variant="destructive"
                   size="icon"
                   className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                  onClick={() => setPhotoUrl("")}
+                  onClick={handlePhotoRemove}
+                  disabled={uploading}
                 >
                   <X className="h-3 w-3" />
                 </Button>
@@ -176,16 +224,25 @@ export function SettingsForm() {
                 <Upload className="h-8 w-8 text-muted-foreground" />
               </div>
             )}
-            <div>
+            <div className="flex-1">
               <Input
                 type="file"
                 accept="image/*"
                 onChange={handlePhotoUpload}
+                disabled={uploading}
                 className="max-w-xs"
               />
-              <p className="text-sm text-muted-foreground mt-2">
-                {t("admin.settings.photoRecommendation")}
-              </p>
+              {uploading && (
+                <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Enviando foto...
+                </p>
+              )}
+              {!uploading && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {t("admin.settings.photoRecommendation")}
+                </p>
+              )}
             </div>
           </div>
         </CardContent>

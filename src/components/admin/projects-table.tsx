@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/table";
 import { useI18n, useTranslations } from "@/i18n/client";
 import analytics from "@/lib/analytics";
-import { deleteProject } from "@/lib/firebase/services/admin-projects";
 import type { Project } from "@/lib/firebase/types";
 
 interface ProjectsTableProps {
@@ -64,7 +63,13 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
 
     setIsDeleting(true);
     try {
-      await deleteProject(projectToDelete.id);
+      const response = await fetch(`/api/admin/projects/${projectToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Falha ao deletar projeto");
+      }
 
       analytics.admin.projectDeleted(
         projectToDelete.id,
@@ -172,8 +177,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
               {t("admin.projects.deleteConfirm")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("admin.projects.deleteConfirm")} "
-              {projectToDelete?.title[locale]}"
+              {t("admin.projects.deleteDescription")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -185,7 +189,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? t("common.loading") : t("common.delete")}
+              {isDeleting ? t("admin.projects.deleting") : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
