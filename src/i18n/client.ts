@@ -63,7 +63,6 @@ function setCookie(name: string, value: string, days = 365) {
   const secureAttr = isSecure ? "; Secure" : "";
   const sameSiteAttr = "; SameSite=Lax";
 
-  // biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API not supported in this browser, using document.cookie as fallback.
   document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(
     value,
   )}; expires=${expires}; path=/${secureAttr}${sameSiteAttr}`;

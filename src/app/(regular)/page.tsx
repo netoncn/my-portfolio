@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getPublishedProjects } from "@/lib/firebase/services/projects";
 import { getSettings } from "@/lib/firebase/services/settings";
 
-export const revalidate = 3600; // ISR: Revalidate every hour
+export const revalidate = 3600;
 
 function ProjectsLoadingSkeleton() {
   return (

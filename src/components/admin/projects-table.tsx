@@ -63,9 +63,12 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/projects/${projectToDelete.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/projects/${projectToDelete.id}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       if (!response.ok) {
         throw new Error("Falha ao deletar projeto");

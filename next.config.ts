@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         hostname: "firebasestorage.googleapis.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "qoxzolkhunqdvtgqlrnf.supabase.co",
+        pathname: "/**",
+      },
     ],
 
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],

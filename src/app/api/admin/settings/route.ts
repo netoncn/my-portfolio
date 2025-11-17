@@ -15,8 +15,13 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error("[API] Update settings error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Erro ao atualizar configurações" },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Erro ao atualizar configurações",
+      },
+      { status: 500 },
     );
   }
 }

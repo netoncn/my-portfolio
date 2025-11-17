@@ -1,12 +1,11 @@
-import { COLLECTIONS } from "../collections";
+import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "../admin";
+import { COLLECTIONS } from "../collections";
 import type { Project, ProjectFormData, ProjectStatus } from "../types";
 import {
   decrementTechnologyUsage,
   incrementTechnologyUsage,
 } from "./technologies";
-
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
 type ProjectFirestoreData = Omit<Project, "id" | "createdAt" | "updatedAt"> & {
   createdAt?: any;
@@ -78,19 +77,23 @@ export async function updateProject(
     const oldProject = await getProjectByIdAdmin(id);
 
     const sanitizedData: Record<string, any> = {};
-    
+
     for (const [key, value] of Object.entries(data)) {
       if (value !== null && value !== undefined) {
         sanitizedData[key] = value;
       } else {
-        if (key === "githubUrl" || key === "liveUrl" || key === "thumbnailUrl") {
+        if (
+          key === "githubUrl" ||
+          key === "liveUrl" ||
+          key === "thumbnailUrl"
+        ) {
           sanitizedData[key] = "";
         }
       }
     }
 
     const docRef = adminDb.collection(COLLECTIONS.PROJECTS).doc(id);
-    
+
     await docRef.update({
       ...sanitizedData,
       updatedAt: FieldValue.serverTimestamp(),

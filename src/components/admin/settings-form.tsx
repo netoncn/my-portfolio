@@ -27,7 +27,7 @@ import type {
   MultilingualText,
   PortfolioSettingsInput,
 } from "@/lib/firebase/types";
-import { uploadImage, deleteImage } from "@/lib/firebase/storage";
+import { deleteImage, uploadImage } from "@/lib/supabase/storage";
 
 const LANGUAGES = [
   { code: "pt-BR", label: "Português" },
@@ -124,7 +124,7 @@ export function SettingsForm() {
       setUploading(false);
     }
   };
-  
+
   const handlePhotoRemove = async () => {
     try {
       if (oldPhotoUrl) {

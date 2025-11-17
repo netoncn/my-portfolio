@@ -1,6 +1,7 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
@@ -32,6 +33,12 @@ import type {
   ProjectCategory,
   ProjectStatus,
 } from "@/lib/firebase/types";
+import {
+  deleteImage,
+  generateUniqueFileName,
+  uploadImage,
+  validateImageFile,
+} from "@/lib/supabase/storage";
 import { generateSlug } from "@/lib/utils";
 
 interface ProjectFormProps {
@@ -90,9 +97,15 @@ export function ProjectForm({ project }: ProjectFormProps) {
   );
   const [thumbnailUrl, setThumbnailUrl] = useState(project?.thumbnailUrl || "");
   const [images, setImages] = useState<string[]>(project?.images || []);
-  const [imageInput, setImageInput] = useState("");
   const [featured, setFeatured] = useState(project?.featured || false);
   const [order, setOrder] = useState(project?.order || 0);
+
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [oldThumbnailUrl, setOldThumbnailUrl] = useState(
+    project?.thumbnailUrl || "",
+  );
+  const [oldImages, _setOldImages] = useState<string[]>(project?.images || []);
 
   const [availableTechnologies, setAvailableTechnologies] = useState<
     Array<{ value: string; label: string }>
@@ -160,15 +173,113 @@ export function ProjectForm({ project }: ProjectFormProps) {
     setTechnologies(technologies.filter((t) => t !== tech));
   };
 
-  const handleAddImage = () => {
-    if (imageInput.trim() && !images.includes(imageInput.trim())) {
-      setImages([...images, imageInput.trim()]);
-      setImageInput("");
+  const handleThumbnailUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      toast.error(validation.error);
+      return;
+    }
+
+    setUploadingThumbnail(true);
+
+    try {
+      const fileName = `thumbnail-${generateUniqueFileName(file.name)}`;
+      const path = `projects/${slug || "temp"}/${fileName}`;
+
+      const url = await uploadImage(file, path);
+
+      if (oldThumbnailUrl && oldThumbnailUrl !== url) {
+        await deleteImage(oldThumbnailUrl).catch(console.error);
+      }
+
+      setThumbnailUrl(url);
+      setOldThumbnailUrl(url);
+      toast.success("Thumbnail enviada com sucesso!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao fazer upload da thumbnail",
+      );
+    } finally {
+      setUploadingThumbnail(false);
     }
   };
 
-  const handleRemoveImage = (image: string) => {
-    setImages(images.filter((i) => i !== image));
+  const handleRemoveThumbnail = async () => {
+    try {
+      if (thumbnailUrl) {
+        await deleteImage(thumbnailUrl).catch(console.error);
+      }
+      setThumbnailUrl("");
+      setOldThumbnailUrl("");
+      toast.success("Thumbnail removida com sucesso!");
+    } catch (error) {
+      console.error("Remove error:", error);
+      toast.error("Erro ao remover thumbnail");
+    }
+  };
+
+  const handleGalleryUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    for (const file of Array.from(files)) {
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast.error(`${file.name}: ${validation.error}`);
+        return;
+      }
+    }
+
+    setUploadingGallery(true);
+
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const fileName = `gallery-${generateUniqueFileName(file.name)}`;
+        const path = `projects/${slug || "temp"}/${fileName}`;
+        return await uploadImage(file, path);
+      });
+
+      const urls = await Promise.all(uploadPromises);
+      setImages((prev) => [...prev, ...urls]);
+
+      toast.success(
+        files.length === 1
+          ? "Imagem adicionada com sucesso!"
+          : `${files.length} imagens adicionadas com sucesso!`,
+      );
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao fazer upload das imagens",
+      );
+    } finally {
+      setUploadingGallery(false);
+
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveGalleryImage = async (imageUrl: string) => {
+    try {
+      await deleteImage(imageUrl).catch(console.error);
+      setImages((prev) => prev.filter((img) => img !== imageUrl));
+      toast.success("Imagem removida com sucesso!");
+    } catch (error) {
+      console.error("Remove error:", error);
+      toast.error("Erro ao remover imagem");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -230,6 +341,11 @@ export function ProjectForm({ project }: ProjectFormProps) {
           throw new Error("Falha ao atualizar projeto");
         }
 
+        const removedImages = oldImages.filter((img) => !images.includes(img));
+        await Promise.all(
+          removedImages.map((img) => deleteImage(img).catch(console.error)),
+        );
+
         analytics.admin.projectUpdated(project.id, title["pt-BR"]);
         toast.success(t("admin.projects.updateSuccess"));
       } else {
@@ -262,6 +378,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {}
       <div className="space-y-3">
         <Label>{t("admin.projects.form.title")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
@@ -297,6 +414,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </Tabs>
       </div>
 
+      {}
       <div className="space-y-2">
         <Label htmlFor="slug">{t("admin.projects.form.slug")} *</Label>
         <Input
@@ -311,6 +429,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </p>
       </div>
 
+      {}
       <div className="space-y-3">
         <Label>{t("admin.projects.form.shortDescription")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
@@ -364,6 +483,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </Tabs>
       </div>
 
+      {}
       <div className="space-y-3">
         <Label>{t("admin.projects.form.longDescription")} *</Label>
         <Tabs defaultValue="pt-BR" className="w-full">
@@ -417,6 +537,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </Tabs>
       </div>
 
+      {}
       <div className="grid gap-6 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="category">{t("admin.projects.form.category")}</Label>
@@ -468,6 +589,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
       </div>
 
+      {}
       <div className="space-y-3">
         <Label>{t("admin.projects.form.technologies")} *</Label>
         <div className="flex gap-2">
@@ -516,6 +638,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
       </div>
 
+      {}
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="githubUrl">
@@ -542,6 +665,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </div>
       </div>
 
+      {}
       <div className="flex items-center space-x-2">
         <Switch
           id="hasSourceCode"
@@ -553,61 +677,111 @@ export function ProjectForm({ project }: ProjectFormProps) {
         </Label>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="thumbnailUrl">
-          {t("admin.projects.form.thumbnailUrl")}
-        </Label>
-        <Input
-          id="thumbnailUrl"
-          type="url"
-          value={thumbnailUrl}
-          onChange={(e) => setThumbnailUrl(e.target.value)}
-          placeholder={t("admin.projects.form.thumbnailPlaceholder")}
-        />
+      {}
+      <div className="space-y-3">
+        <Label>{t("admin.projects.form.thumbnailUrl")}</Label>
+        <div className="space-y-4">
+          {thumbnailUrl ? (
+            <div className="relative inline-block">
+              <Image
+                src={thumbnailUrl}
+                alt="Thumbnail"
+                width={300}
+                height={169}
+                className="rounded-lg border object-cover"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                onClick={handleRemoveThumbnail}
+                disabled={uploadingThumbnail}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full h-40 border-2 border-dashed rounded-lg bg-muted">
+              <Upload className="h-8 w-8 text-muted-foreground" />
+            </div>
+          )}
+          <div>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleThumbnailUpload}
+              disabled={uploadingThumbnail}
+              className="max-w-xs"
+            />
+            {uploadingThumbnail && (
+              <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Fazendo upload da thumbnail...
+              </p>
+            )}
+            {!uploadingThumbnail && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Recomendado: proporção 16:9, máximo 5MB
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
+      {}
       <div className="space-y-3">
         <Label>{t("admin.projects.form.imageGallery")}</Label>
-        <div className="flex gap-2">
-          <Input
-            type="url"
-            value={imageInput}
-            onChange={(e) => setImageInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddImage();
-              }
-            }}
-            placeholder={t("admin.projects.form.imageUrlPlaceholder")}
-            className="flex-1"
-          />
-          <Button type="button" onClick={handleAddImage} variant="secondary">
-            {t("admin.projects.form.addImage")}
-          </Button>
-        </div>
-        {images.length > 0 && (
-          <div className="space-y-2">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 p-2 border rounded-lg"
-              >
-                <span className="text-sm flex-1 truncate">{image}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveImage(image)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+        <div className="space-y-4">
+          <div>
+            <Input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleGalleryUpload}
+              disabled={uploadingGallery}
+              className="max-w-xs"
+            />
+            {uploadingGallery && (
+              <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Fazendo upload das imagens...
+              </p>
+            )}
+            {!uploadingGallery && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Você pode selecionar múltiplas imagens. Máximo 5MB cada.
+              </p>
+            )}
           </div>
-        )}
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <Image
+                    src={image}
+                    alt={`Galeria ${index + 1}`}
+                    width={200}
+                    height={150}
+                    className="rounded-lg border object-cover w-full aspect-video"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleRemoveGalleryImage(image)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
+      {}
       <div className="flex items-center space-x-2">
         <Switch
           id="featured"
@@ -617,6 +791,7 @@ export function ProjectForm({ project }: ProjectFormProps) {
         <Label htmlFor="featured">{t("admin.projects.form.featured")}</Label>
       </div>
 
+      {}
       <div className="flex gap-4 pt-6 border-t">
         <Button type="submit" disabled={isSubmitting} size="lg">
           {isSubmitting

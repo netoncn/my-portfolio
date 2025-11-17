@@ -8,10 +8,10 @@ export function cn(...inputs: ClassValue[]) {
 export function generateSlug(text: string): string {
   return text
     .toLowerCase()
-    .normalize("NFD") // Decompõe caracteres acentuados
-    .replace(/[\u0300-\u036f]/g, "") // Remove marcas diacríticas (acentos)
-    .replace(/[^a-z0-9\s-]/g, "") // Remove caracteres especiais
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, "-") // Substitui espaços por hífens
-    .replace(/-+/g, "-"); // Remove hífens duplicados
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 }

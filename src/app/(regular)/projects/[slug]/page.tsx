@@ -5,7 +5,7 @@ import {
   getProjectBySlug,
 } from "@/lib/firebase/services/projects";
 
-export const revalidate = 3600; // Revalidate every hour (ISR)
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getAllProjectSlugs();
