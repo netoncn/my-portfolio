@@ -48,7 +48,7 @@ export function ContactSection({
             <Button asChild size="lg" onClick={handleEmailClick}>
               <a href={`mailto:${settings.email}`}>
                 <Mail className="mr-2 h-4 w-4" />
-                Enviar Email
+                {t("portfolio.contact.sendEmail")}
               </a>
             </Button>
           )}

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { AIDescriptionGenerator } from "@/components/admin/ai-description-generator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
@@ -431,7 +432,18 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       {}
       <div className="space-y-3">
-        <Label>{t("admin.projects.form.shortDescription")} *</Label>
+        <div className="flex items-center justify-between">
+          <Label>{t("admin.projects.form.shortDescription")} *</Label>
+          <AIDescriptionGenerator
+            title={title["pt-BR"]}
+            category={category}
+            technologies={technologies}
+            type="short"
+            previousText={shortDescription}
+            githubUrl={githubUrl}
+            onGenerated={(descriptions) => setShortDescription(descriptions)}
+          />
+        </div>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pt-BR">{t("languages.pt-BR")}</TabsTrigger>
@@ -485,7 +497,18 @@ export function ProjectForm({ project }: ProjectFormProps) {
 
       {}
       <div className="space-y-3">
-        <Label>{t("admin.projects.form.longDescription")} *</Label>
+        <div className="flex items-center justify-between">
+          <Label>{t("admin.projects.form.longDescription")} *</Label>
+          <AIDescriptionGenerator
+            title={title["pt-BR"]}
+            category={category}
+            technologies={technologies}
+            type="long"
+            previousText={longDescription}
+            githubUrl={githubUrl}
+            onGenerated={(descriptions) => setLongDescription(descriptions)}
+          />
+        </div>
         <Tabs defaultValue="pt-BR" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="pt-BR">{t("languages.pt-BR")}</TabsTrigger>

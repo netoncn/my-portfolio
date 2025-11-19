@@ -71,6 +71,7 @@
     "contact": {
       "title": "Vamos Conversar",
       "description": "Interessado em trabalhar juntos? Entre em contato comigo através das redes sociais.",
+      "sendEmail": "Enviar Email",
       "email": "Email",
       "github": "GitHub",
       "linkedin": "LinkedIn"
@@ -265,5 +266,9 @@
       "title": "Erro ao fazer login",
       "description": "Ocorreu um erro ao tentar fazer login."
     }
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados.",
+    "builtWith": "Construído com"
   }
 }

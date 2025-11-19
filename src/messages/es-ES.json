@@ -71,7 +71,8 @@
     "contact": {
       "title": "Hablemos",
       "description": "¿Interesado en trabajar juntos? Contáctame a través de las redes sociales.",
-      "email": "Email",
+      "sendEmail": "Enviar Correo",
+      "email": "Correo Electrónico",
       "github": "GitHub",
       "linkedin": "LinkedIn"
     },
@@ -265,5 +266,9 @@
       "title": "Error al iniciar sesión",
       "description": "Ocurrió un error al intentar iniciar sesión."
     }
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "builtWith": "Construido con"
   }
 }

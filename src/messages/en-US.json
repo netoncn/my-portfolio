@@ -71,6 +71,7 @@
     "contact": {
       "title": "Let's Talk",
       "description": "Interested in working together? Get in touch with me through social media.",
+      "sendEmail": "Send Email",
       "email": "Email",
       "github": "GitHub",
       "linkedin": "LinkedIn"
@@ -265,5 +266,9 @@
       "title": "Error logging in",
       "description": "An error occurred while trying to log in."
     }
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "builtWith": "Built with"
   }
 }

@@ -6,15 +6,16 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/i18n/client";
 import analytics from "@/lib/analytics";
+import type { MultilingualText } from "@/lib/firebase/types";
 
 interface AIDescriptionGeneratorProps {
   title: string;
   category: string;
   technologies: string[];
   type: "short" | "long";
-  text?: string | undefined;
+  previousText?: MultilingualText;
   githubUrl?: string | undefined;
-  onGenerated: (description: string) => void;
+  onGenerated: (descriptions: MultilingualText) => void;
 }
 
 export function AIDescriptionGenerator({
@@ -22,7 +23,7 @@ export function AIDescriptionGenerator({
   category,
   technologies,
   type,
-  text,
+  previousText,
   githubUrl,
   onGenerated,
 }: AIDescriptionGeneratorProps) {
@@ -55,7 +56,7 @@ export function AIDescriptionGenerator({
           category,
           technologies,
           type,
-          text,
+          previousText,
           githubUrl,
         }),
       });
@@ -64,8 +65,8 @@ export function AIDescriptionGenerator({
         throw new Error(t("admin.ai.generationFailed"));
       }
 
-      const { description } = await response.json();
-      onGenerated(description);
+      const { descriptions } = await response.json();
+      onGenerated(descriptions);
 
       analytics.admin.aiDescriptionGenerated(type);
 
