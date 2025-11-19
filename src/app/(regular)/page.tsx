@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ContactSection } from "@/components/portfolio/contact-section";
 import { HeroSection } from "@/components/portfolio/hero-section";
@@ -5,8 +6,19 @@ import { ProjectsGrid } from "@/components/portfolio/projects-grid";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getPublishedProjects } from "@/lib/firebase/services/projects";
 import { getSettings } from "@/lib/firebase/services/settings";
+import {
+  JsonLd,
+  generateHomeMetadata,
+  generatePersonJsonLd,
+  generateWebSiteJsonLd,
+} from "@/lib/seo";
 
 export const revalidate = 3600;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return generateHomeMetadata(settings || undefined);
+}
 
 function ProjectsLoadingSkeleton() {
   return (
@@ -48,8 +60,16 @@ async function ContactWithSettings() {
 }
 
 export default async function HomePage() {
+  const settings = await getSettings();
+
+  const jsonLdData = settings
+    ? [generatePersonJsonLd(settings), generateWebSiteJsonLd(settings)]
+    : [];
+
   return (
     <>
+      {jsonLdData.length > 0 && <JsonLd data={jsonLdData} />}
+
       <Suspense
         fallback={
           <div className="min-h-[90vh] flex items-center justify-center">

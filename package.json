@@ -21,7 +21,7 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "postbuild": "next-sitemap && npm run compress:static",
+    "postbuild": "npm run compress:static",
     "compress:static": "node scripts/compress-static.js",
     "lighthouse": "lighthouse http://localhost:3000 --view --preset=desktop",
     "lighthouse:mobile": "lighthouse http://localhost:3000 --view --preset=mobile"

@@ -39,13 +39,52 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio - Nelson Christovam Neto",
-  description: "Portfolio pessoal de projetos e experiências",
+  metadataBase: new URL(
+    process.env.SITE_URL || "https://netoncn.com.br",
+  ),
+  title: {
+    default: "Nelson Christovam Neto - Desenvolvedor Full Stack",
+    template: "%s | Nelson Christovam Neto",
+  },
+  description:
+    "Portfolio de Nelson Christovam Neto - Desenvolvedor Full Stack criando experiências digitais modernas e funcionais com React, Next.js, TypeScript e Firebase.",
+  keywords: [
+    "nelson christovam neto",
+    "desenvolvedor full stack",
+    "portfolio",
+    "react",
+    "nextjs",
+    "typescript",
+    "firebase",
+    "web development",
+    "desenvolvedor",
+    "programador",
+    "freelancer",
+    "projetos",
+    "freelance",
+    "freelancing",
+    "cto",
+    "aplicações web",
+    "desenvolvimento de software",
+  ],
+  authors: [{ name: "Nelson Christovam Neto" }],
+  creator: "Nelson Christovam Neto",
+  publisher: "Nelson Christovam Neto",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Portfolio",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
   },
 };
 
