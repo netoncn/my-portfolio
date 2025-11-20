@@ -760,9 +760,9 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 **Nelson Christovam Neto**
 
 - 🌐 Website: [netoncn.com.br](https://netoncn.com.br)
-- 💼 LinkedIn: [linkedin.com/in/netoncn](https://linkedin.com/in/netoncn)
+- 💼 LinkedIn: [linkedin.com/in/netoncn](https://www.linkedin.com/in/nelson-christovam-neto-74077b118/)
 - 🐙 GitHub: [@netoncn](https://github.com/netoncn)
-- 📧 Email: contato@netoncn.com.br
+- 📧 Email: netoncn@hotmail.com
 
 ---
 
